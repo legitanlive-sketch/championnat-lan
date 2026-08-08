@@ -138,6 +138,10 @@
   .add-card:hover{ border-color:var(--magenta); color:var(--magenta); }
   .add-card .plus{ font-size:30px; font-family:'Orbitron',sans-serif; }
   .locked-msg{ color:var(--muted); font-size:11px; font-family:'JetBrains Mono',monospace; text-align:center; padding:10px; }
+  .delete-game-link{ margin-top:16px; padding-top:12px; border-top:1px dashed var(--card-border);
+    color:var(--muted); font-size:11px; font-family:'JetBrains Mono',monospace; text-align:center;
+    cursor:pointer; letter-spacing:0.03em; transition: color .15s; }
+  .delete-game-link:hover{ color:var(--magenta); }
 
   .table-wrap{ overflow-x:auto; border:1px solid var(--card-border); border-radius:var(--radius); background:var(--card-bg); }
   table{ width:100%; border-collapse:collapse; min-width:560px; }
@@ -159,6 +163,11 @@
   .swatches{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
   .swatch{ width:100%; aspect-ratio:1; border-radius:50%; cursor:pointer; border:2px solid transparent; transition:transform .15s; }
   .swatch:hover{ transform:scale(1.15); border-color:#fff; }
+  .icon-grid{ display:grid; grid-template-columns:repeat(5,1fr); gap:8px; max-height:280px; overflow-y:auto; padding-right:4px; }
+  .icon-swatch{ background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-radius:10px; padding:8px;
+    cursor:pointer; transition: border-color .15s, transform .15s; }
+  .icon-swatch svg{ width:100%; height:100%; display:block; }
+  .icon-swatch:hover{ border-color:var(--cyan); transform:scale(1.08); }
   .modal-cancel{ margin-top:16px; background:none; border:1px solid var(--card-border); color:var(--muted); padding:7px 14px; border-radius:8px; cursor:pointer; font-family:'JetBrains Mono',monospace; font-size:11px;}
 
   @media (prefers-reduced-motion: reduce){ .grid-floor{ animation:none; } }
@@ -217,7 +226,20 @@
     skull: '<svg viewBox="0 0 48 48" fill="none"><defs><linearGradient id="gSkull" x1="0" y1="0" x2="48" y2="48"><stop offset="0" stop-color="#00e5ff"/><stop offset="1" stop-color="#ff2e92"/></linearGradient></defs><path d="M24 5c-9.4 0-16 6.7-16 15.2 0 5.6 2.8 9 5.4 11.4v6.8c0 1 .8 1.8 1.8 1.8h3.2v-4h3v4h5v-4h3v4h3.2c1 0 1.8-.8 1.8-1.8v-6.8c2.6-2.4 5.4-5.8 5.4-11.4C40 11.7 33.4 5 24 5z" stroke="url(#gSkull)" stroke-width="2" stroke-linejoin="round"/><circle cx="17" cy="21" r="3" stroke="url(#gSkull)" stroke-width="2"/><circle cx="31" cy="21" r="3" stroke="url(#gSkull)" stroke-width="2"/><path d="M22 27h4l-2 4-2-4z" stroke="url(#gSkull)" stroke-width="1.6" stroke-linejoin="round"/></svg>',
     car: '<svg viewBox="0 0 48 48" fill="none"><defs><linearGradient id="gCar" x1="0" y1="0" x2="48" y2="48"><stop offset="0" stop-color="#00e5ff"/><stop offset="1" stop-color="#ff2e92"/></linearGradient></defs><path d="M6 30l3-9c1-3 4-5 7-5h16c3 0 6 2 7 5l3 9" stroke="url(#gCar)" stroke-width="2" stroke-linejoin="round"/><path d="M6 30h36v4a2 2 0 01-2 2h-3a3 3 0 01-6 0H19a3 3 0 01-6 0H8a2 2 0 01-2-2v-4z" stroke="url(#gCar)" stroke-width="2" stroke-linejoin="round"/><path d="M14 16l-2 6M34 16l2 6" stroke="url(#gCar)" stroke-width="2"/><circle cx="14" cy="34" r="1.6" fill="url(#gCar)"/><circle cx="34" cy="34" r="1.6" fill="url(#gCar)"/><path d="M40 22l4-2" stroke="url(#gCar)" stroke-width="2" stroke-linecap="round"/></svg>',
     hex: '<svg viewBox="0 0 48 48" fill="none"><defs><linearGradient id="gHex" x1="0" y1="0" x2="48" y2="48"><stop offset="0" stop-color="#00e5ff"/><stop offset="1" stop-color="#ff2e92"/></linearGradient></defs><path d="M24 4l17 10v20L24 44 7 34V14L24 4z" stroke="url(#gHex)" stroke-width="2" stroke-linejoin="round"/><path d="M24 15l8 5v9l-8 5-8-5v-9l8-5z" stroke="url(#gHex)" stroke-width="1.6" stroke-linejoin="round"/><circle cx="24" cy="24" r="2" fill="url(#gHex)"/></svg>',
-    controller: '<svg viewBox="0 0 48 48" fill="none"><defs><linearGradient id="gCtrl" x1="0" y1="0" x2="48" y2="48"><stop offset="0" stop-color="#00e5ff"/><stop offset="1" stop-color="#ff2e92"/></linearGradient></defs><path d="M13 18h6M16 15v6" stroke="url(#gCtrl)" stroke-width="2" stroke-linecap="round"/><circle cx="33" cy="16" r="1.8" fill="url(#gCtrl)"/><circle cx="29" cy="20" r="1.8" fill="url(#gCtrl)"/><path d="M11 18c-4 0-6 4-6 9 0 5 2 9 5 9 2.5 0 3.5-3 6-3h16c2.5 0 3.5 3 6 3 3 0 5-4 5-9 0-5-2-9-6-9H11z" stroke="url(#gCtrl)" stroke-width="2" stroke-linejoin="round"/></svg>'
+    controller: '<svg viewBox="0 0 48 48" fill="none"><defs><linearGradient id="gCtrl" x1="0" y1="0" x2="48" y2="48"><stop offset="0" stop-color="#00e5ff"/><stop offset="1" stop-color="#ff2e92"/></linearGradient></defs><path d="M13 18h6M16 15v6" stroke="url(#gCtrl)" stroke-width="2" stroke-linecap="round"/><circle cx="33" cy="16" r="1.8" fill="url(#gCtrl)"/><circle cx="29" cy="20" r="1.8" fill="url(#gCtrl)"/><path d="M11 18c-4 0-6 4-6 9 0 5 2 9 5 9 2.5 0 3.5-3 6-3h16c2.5 0 3.5 3 6 3 3 0 5-4 5-9 0-5-2-9-6-9H11z" stroke="url(#gCtrl)" stroke-width="2" stroke-linejoin="round"/></svg>',
+    sword: '<svg viewBox="0 0 48 48" fill="none"><defs><linearGradient id="gSword" x1="0" y1="0" x2="48" y2="48"><stop offset="0" stop-color="#00e5ff"/><stop offset="1" stop-color="#ff2e92"/></linearGradient></defs><path d="M30 8l10 10-4 4-10-10z" stroke="url(#gSword)" stroke-width="2" stroke-linejoin="round"/><path d="M32 18L14 36" stroke="url(#gSword)" stroke-width="2" stroke-linecap="round"/><path d="M10 34l4 4M8 40l4-4" stroke="url(#gSword)" stroke-width="2" stroke-linecap="round"/><path d="M18 30l4 4" stroke="url(#gSword)" stroke-width="2" stroke-linecap="round"/></svg>',
+    trophy: '<svg viewBox="0 0 48 48" fill="none"><defs><linearGradient id="gTrophy" x1="0" y1="0" x2="48" y2="48"><stop offset="0" stop-color="#00e5ff"/><stop offset="1" stop-color="#ff2e92"/></linearGradient></defs><path d="M16 8h16v10a8 8 0 01-16 0V8z" stroke="url(#gTrophy)" stroke-width="2" stroke-linejoin="round"/><path d="M16 10h-6a2 2 0 000 4c0 4 3 6 6 6M32 10h6a2 2 0 010 4c0 4-3 6-6 6" stroke="url(#gTrophy)" stroke-width="2" stroke-linejoin="round"/><path d="M24 26v6" stroke="url(#gTrophy)" stroke-width="2"/><path d="M20 36h8v4h-8z" stroke="url(#gTrophy)" stroke-width="2" stroke-linejoin="round"/><path d="M18 40h12" stroke="url(#gTrophy)" stroke-width="2" stroke-linecap="round"/></svg>',
+    dice: '<svg viewBox="0 0 48 48" fill="none"><defs><linearGradient id="gDice" x1="0" y1="0" x2="48" y2="48"><stop offset="0" stop-color="#00e5ff"/><stop offset="1" stop-color="#ff2e92"/></linearGradient></defs><rect x="10" y="10" width="28" height="28" rx="6" stroke="url(#gDice)" stroke-width="2"/><circle cx="18" cy="18" r="2" fill="url(#gDice)"/><circle cx="30" cy="18" r="2" fill="url(#gDice)"/><circle cx="24" cy="24" r="2" fill="url(#gDice)"/><circle cx="18" cy="30" r="2" fill="url(#gDice)"/><circle cx="30" cy="30" r="2" fill="url(#gDice)"/></svg>',
+    joystick: '<svg viewBox="0 0 48 48" fill="none"><defs><linearGradient id="gJoy" x1="0" y1="0" x2="48" y2="48"><stop offset="0" stop-color="#00e5ff"/><stop offset="1" stop-color="#ff2e92"/></linearGradient></defs><circle cx="24" cy="14" r="6" stroke="url(#gJoy)" stroke-width="2"/><path d="M24 20v14" stroke="url(#gJoy)" stroke-width="2"/><path d="M12 40h24" stroke="url(#gJoy)" stroke-width="2" stroke-linecap="round"/><path d="M18 34l-6 6M30 34l6 6" stroke="url(#gJoy)" stroke-width="2" stroke-linecap="round"/></svg>',
+    target: '<svg viewBox="0 0 48 48" fill="none"><defs><linearGradient id="gTarget" x1="0" y1="0" x2="48" y2="48"><stop offset="0" stop-color="#00e5ff"/><stop offset="1" stop-color="#ff2e92"/></linearGradient></defs><circle cx="24" cy="24" r="14" stroke="url(#gTarget)" stroke-width="2"/><circle cx="24" cy="24" r="8" stroke="url(#gTarget)" stroke-width="2"/><circle cx="24" cy="24" r="2" fill="url(#gTarget)"/><path d="M24 4v6M24 38v6M4 24h6M38 24h6" stroke="url(#gTarget)" stroke-width="2" stroke-linecap="round"/></svg>',
+    rocket: '<svg viewBox="0 0 48 48" fill="none"><defs><linearGradient id="gRocket" x1="0" y1="0" x2="48" y2="48"><stop offset="0" stop-color="#00e5ff"/><stop offset="1" stop-color="#ff2e92"/></linearGradient></defs><path d="M24 4c6 4 8 12 8 18 0 4-2 8-8 8s-8-4-8-8c0-6 2-14 8-18z" stroke="url(#gRocket)" stroke-width="2" stroke-linejoin="round"/><circle cx="24" cy="18" r="3" stroke="url(#gRocket)" stroke-width="2"/><path d="M16 26l-6 8 8-2M32 26l6 8-8-2" stroke="url(#gRocket)" stroke-width="2" stroke-linejoin="round"/><path d="M20 34l-2 8 6-4 6 4-2-8" stroke="url(#gRocket)" stroke-width="2" stroke-linejoin="round"/></svg>',
+    puzzle: '<svg viewBox="0 0 48 48" fill="none"><defs><linearGradient id="gPuzzle" x1="0" y1="0" x2="48" y2="48"><stop offset="0" stop-color="#00e5ff"/><stop offset="1" stop-color="#ff2e92"/></linearGradient></defs><path d="M10 10h12v6a3 3 0 106 0v-6h10v12h-6a3 3 0 100 6h6v10H28v-6a3 3 0 10-6 0v6H10V28h6a3 3 0 100-6h-6z" stroke="url(#gPuzzle)" stroke-width="2" stroke-linejoin="round"/></svg>',
+    cards: '<svg viewBox="0 0 48 48" fill="none"><defs><linearGradient id="gCards" x1="0" y1="0" x2="48" y2="48"><stop offset="0" stop-color="#00e5ff"/><stop offset="1" stop-color="#ff2e92"/></linearGradient></defs><rect x="6" y="16" width="20" height="28" rx="3" transform="rotate(-10 6 16)" stroke="url(#gCards)" stroke-width="2"/><rect x="18" y="8" width="20" height="28" rx="3" stroke="url(#gCards)" stroke-width="2"/></svg>',
+    shield: '<svg viewBox="0 0 48 48" fill="none"><defs><linearGradient id="gShield" x1="0" y1="0" x2="48" y2="48"><stop offset="0" stop-color="#00e5ff"/><stop offset="1" stop-color="#ff2e92"/></linearGradient></defs><path d="M24 6l14 6v10c0 10-6 16-14 20-8-4-14-10-14-20V12z" stroke="url(#gShield)" stroke-width="2" stroke-linejoin="round"/><path d="M18 24l4 4 8-8" stroke="url(#gShield)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    ball: '<svg viewBox="0 0 48 48" fill="none"><defs><linearGradient id="gBall" x1="0" y1="0" x2="48" y2="48"><stop offset="0" stop-color="#00e5ff"/><stop offset="1" stop-color="#ff2e92"/></linearGradient></defs><circle cx="24" cy="24" r="16" stroke="url(#gBall)" stroke-width="2"/><path d="M24 8v32M8 24h32M13 13c6 6 16 6 22 0M13 35c6-6 16-6 22 0" stroke="url(#gBall)" stroke-width="1.6"/></svg>',
+    crown: '<svg viewBox="0 0 48 48" fill="none"><defs><linearGradient id="gCrown" x1="0" y1="0" x2="48" y2="48"><stop offset="0" stop-color="#00e5ff"/><stop offset="1" stop-color="#ff2e92"/></linearGradient></defs><path d="M8 34l-2-16 8 6 10-12 10 12 8-6-2 16z" stroke="url(#gCrown)" stroke-width="2" stroke-linejoin="round"/><path d="M8 34h32v4H8z" stroke="url(#gCrown)" stroke-width="2" stroke-linejoin="round"/></svg>',
+    ghost: '<svg viewBox="0 0 48 48" fill="none"><defs><linearGradient id="gGhost" x1="0" y1="0" x2="48" y2="48"><stop offset="0" stop-color="#00e5ff"/><stop offset="1" stop-color="#ff2e92"/></linearGradient></defs><path d="M14 40V20a10 10 0 0120 0v20l-4-4-3 4-3-4-3 4-3-4-4 4z" stroke="url(#gGhost)" stroke-width="2" stroke-linejoin="round"/><circle cx="19" cy="20" r="1.6" fill="url(#gGhost)"/><circle cx="29" cy="20" r="1.6" fill="url(#gGhost)"/></svg>',
+    map: '<svg viewBox="0 0 48 48" fill="none"><defs><linearGradient id="gMap" x1="0" y1="0" x2="48" y2="48"><stop offset="0" stop-color="#00e5ff"/><stop offset="1" stop-color="#ff2e92"/></linearGradient></defs><path d="M8 12l12-4 8 4 12-4v28l-12 4-8-4-12 4z" stroke="url(#gMap)" stroke-width="2" stroke-linejoin="round"/><path d="M20 8v28M28 12v28" stroke="url(#gMap)" stroke-width="2"/></svg>'
   };
 
   let unlocked = false;
@@ -351,6 +373,20 @@
     document.body.appendChild(overlay);
     overlay.querySelectorAll('.swatch').forEach(sw=>{
       sw.addEventListener('click', ()=>{ onPick(sw.dataset.c); overlay.remove(); });
+    });
+    overlay.querySelector('.modal-cancel').addEventListener('click', ()=>overlay.remove());
+    overlay.addEventListener('click', e=>{ if(e.target===overlay) overlay.remove(); });
+  }
+
+  // ---------- MODAL ICON PICKER ----------
+  function openIconPicker(title, onPick){
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    const keys = Object.keys(ICONS);
+    overlay.innerHTML = `<div class="modal-box" style="max-width:380px;"><h3>${title}</h3><div class="icon-grid">${keys.map(k=>`<button type="button" class="icon-swatch" data-icon="${k}">${ICONS[k]}</button>`).join('')}</div><button class="modal-cancel">Annuler</button></div>`;
+    document.body.appendChild(overlay);
+    overlay.querySelectorAll('.icon-swatch').forEach(btn=>{
+      btn.addEventListener('click', ()=>{ onPick(btn.dataset.icon); overlay.remove(); });
     });
     overlay.querySelector('.modal-cancel').addEventListener('click', ()=>overlay.remove());
     overlay.addEventListener('click', e=>{ if(e.target===overlay) overlay.remove(); });
@@ -502,6 +538,7 @@
           ${unlocked ? `<button class="add-round-btn" data-addround="${g.id}">+ MANCHE</button>` : ''}
         </div>
         ${roundsHtml || `<div class="hint" style="margin:10px 0 0;">Aucune manche pour l'instant.</div>`}
+        ${unlocked ? `<div class="delete-game-link" data-rmgame="${g.id}">🗑 Supprimer ce jeu</div>` : ''}
       </div>`;
     }).join('') + (unlocked ? `<div class="add-card" id="addGameCard"><div class="plus">+</div><div>AJOUTER UN JEU</div></div>`
                              : `<div class="add-card" style="cursor:default;"><div class="locked-msg">🔒 Déverrouillez le mode édition<br>pour ajouter un jeu ou des manches</div></div>`);
@@ -600,10 +637,20 @@
         if(!name) return;
         const desc = prompt('Format / mode (optionnel) :') || '';
         const isTime = confirm('Ce jeu se classe-t-il par CHRONO (comme le rallye) ?\nOK = chrono · Annuler = classement par position');
-        const id = genId();
-        state.games.push({id, name, desc, icon: isTime?'car':'controller', type: isTime?'time':'rank'});
-        state.rounds[id] = [];
-        saveState(); renderAll();
+        openIconPicker('Choisir une icône', icon=>{
+          const id = genId();
+          state.games.push({id, name, desc, icon, type: isTime?'time':'rank'});
+          state.rounds[id] = [];
+          saveState(); renderAll();
+        });
+      });
+      el.querySelectorAll('.delete-game-link[data-rmgame]').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          if(!confirm('Supprimer ce jeu et toutes ses manches ?')) return;
+          state.games = state.games.filter(g=>g.id!==btn.dataset.rmgame);
+          delete state.rounds[btn.dataset.rmgame];
+          saveState(); renderAll();
+        });
       });
     }
   }
