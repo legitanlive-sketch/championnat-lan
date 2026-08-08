@@ -334,6 +334,17 @@
     return Math.floor(10 * (totalTeams - rank + 1) / totalTeams);
   }
 
+  // Bonus/malus lié à la taille de l'équipe par rapport à la moyenne de la manche (écart max 1 joueur -> ±1 pt)
+  function sizeAdjustment(team, allTeams){
+    const sizes = allTeams.filter(t=>t.members.length>0).map(t=>t.members.length);
+    if(sizes.length < 2) return 0;
+    const avg = sizes.reduce((a,b)=>a+b,0)/sizes.length;
+    const diff = team.members.length - avg;
+    if(diff > 0.01) return -1;
+    if(diff < -0.01) return 1;
+    return 0;
+  }
+
   function recomputeAllTeams(round){
     // on repart de zéro pour tous les joueurs actuellement dans une équipe
     round.teams.forEach(t=>{ t.members.forEach(pid=>{ round.results[pid] = null; }); });
@@ -341,7 +352,7 @@
     round.teams.forEach(t=>{ if(t.position && t.position > N) t.position = null; });
     round.teams.forEach(t=>{
       if(t.position){
-        const pts = teamPointsForRank(t.position, N);
+        const pts = Math.max(0, teamPointsForRank(t.position, N) + sizeAdjustment(t, round.teams));
         t.members.forEach(pid=>{ round.results[pid] = pts; });
       }
     });
@@ -494,15 +505,19 @@
             }
             return out;
           };
-          const teamsHtml = round.teams.map(team => `
+          const teamsHtml = round.teams.map(team => {
+            const adj = sizeAdjustment(team, round.teams);
+            const adjLabel = adj === 0 ? '' : (adj > 0 ? `<span style="color:var(--cyan)">+${adj} pt (effectif réduit)</span>` : `<span style="color:var(--magenta)">${adj} pt (effectif supérieur)</span>`);
+            return `
             <div class="team-block">
               <div class="team-head">
-                <span class="team-label">${team.label}</span>
+                <span class="team-label">${team.label} <span style="color:var(--muted); font-weight:400;">(${team.members.length} joueur${team.members.length>1?'s':''})</span></span>
                 <select data-teampos data-round="${round.id}" data-game="${g.id}" data-team="${team.id}" ${unlocked?'':'disabled'}>
                   ${posOpts(team.position)}
                 </select>
                 ${unlocked ? `<button class="rm-btn" data-rmteam="${team.id}" data-round="${round.id}" data-game="${g.id}" title="Supprimer l'équipe">✕</button>` : ''}
               </div>
+              ${adjLabel ? `<div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; margin:-4px 0 8px;">${adjLabel}</div>` : ''}
               <div class="team-members-row">
                 ${state.players.map(p=>{
                   const active = team.members.includes(p.id);
@@ -510,7 +525,8 @@
                     data-toggpid="${p.id}" data-team="${team.id}" data-round="${round.id}" data-game="${g.id}" ${unlocked?'':'disabled'}>${p.name}</button>`;
                 }).join('')}
               </div>
-            </div>`).join('');
+            </div>`;
+          }).join('');
           teamBuilder = `<div class="team-builder">
             <div class="team-builder-head">
               <span class="lbl">⚡ ATTRIBUTION PAR ÉQUIPE — barème réduit selon nb d'équipes (optionnel)</span>
