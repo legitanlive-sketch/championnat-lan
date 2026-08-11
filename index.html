@@ -116,6 +116,7 @@
   .badge-pts{ font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--gold); min-width:64px; text-align:right; }
 
   .team-builder{ margin-bottom:14px; }
+  .participants-block{ margin-bottom:14px; padding-bottom:14px; border-bottom:1px dashed var(--card-border); }
   .team-builder-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
   .team-builder-head .lbl{ font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted); letter-spacing:0.05em; }
   .add-team-btn{ background:transparent; border:1px solid var(--magenta-dim); color:var(--magenta); font-family:'JetBrains Mono',monospace;
@@ -213,13 +214,12 @@
       </div>
     </div>
 
-    <footer>BARÈME PAR MANCHE · 1er 10 PTS — 2e 8 — 3e 6 — 4e 5 — 5e 4 — 6e 3 — 7e 2 — 8e 1</footer>
+    <footer>BARÈME DYNAMIQUE · LE 1ER GAGNE ~10 PTS × (NB JOUEURS ÷ 8) · RÉGLABLE PAR MANCHE</footer>
   </div>
 
 <script>
   const STORAGE_KEY = 'championnat-lan-state-v2';
   const EDIT_CODE = '12091980';
-  const POINTS = [10,8,6,5,4,3,2,1];
   const PALETTE = ['#ff2e92','#00e5ff','#ffc35a','#7cffb2','#b28dff','#ff6b6b','#4dd2ff','#ffd166','#06d6a0','#f78fb3','#a78bfa','#fb923c','#34d399','#60a5fa','#f472b6','#c4b5fd'];
 
   const ICONS = {
@@ -297,8 +297,6 @@
     }catch(e){ console.error('Erreur de sauvegarde', e); showSync('error'); }
   }
 
-  function pointsForRank(rank){ return rank ? (POINTS[rank-1] || 0) : 0; }
-
   function parseTime(str){
     if(!str) return null;
     str = str.trim();
@@ -314,7 +312,7 @@
   function computeRoundPoints(game, round){
     const pts = {};
     if(game.type === 'rank'){
-      // en mode individuel ET en mode équipe, round.results stocke directement les points finaux
+      // round.results est maintenant recalculé en continu par recomputeRound() -> lecture directe
       state.players.forEach(p=>{ pts[p.id] = round.results[p.id] || 0; });
     } else {
       const entries = state.players
@@ -322,16 +320,23 @@
         .filter(e=>e.sec !== null)
         .sort((a,b)=>a.sec-b.sec);
       state.players.forEach(p=>pts[p.id]=0);
-      entries.forEach((e,i)=>{ pts[e.id] = pointsForRank(i+1); });
+      entries.forEach((e,i)=>{ pts[e.id] = pointsForRank(i+1, entries.length || 8); });
     }
     return pts;
   }
 
-  // Barème équipe : réduit selon le nombre d'équipes en présence dans la manche
-  // 2 équipes -> 10/5 · 3 équipes -> 10/6/3 · 4 équipes -> 10/7/5/2 ...
-  function teamPointsForRank(rank, totalTeams){
+  // Barème dynamique : le 1er de la manche gagne round(10 × nb_joueurs / 8) points,
+  // les places suivantes se répartissent proportionnellement.
+  // 8 joueurs -> 10 pts pour le 1er (comme avant) · 12 joueurs -> 15 pts · 4 joueurs -> 5 pts
+  function firstPlacePoints(P){ return Math.max(1, Math.round(10 * (P||8) / 8)); }
+  function pointsForRank(rank, P){
+    if(!rank || !P) return 0;
+    return Math.max(0, Math.round(firstPlacePoints(P) * (P - rank + 1) / P));
+  }
+  // Barème équipe : basé sur la position parmi les équipes, mis à l'échelle du nombre de joueurs de la manche
+  function teamPointsForRank(rank, totalTeams, P){
     if(!rank || !totalTeams) return 0;
-    return Math.floor(10 * (totalTeams - rank + 1) / totalTeams);
+    return Math.max(0, Math.round(firstPlacePoints(P) * (totalTeams - rank + 1) / totalTeams));
   }
 
   // Bonus/malus lié à la taille de l'équipe par rapport à la moyenne de la manche (écart max 1 joueur -> ±1 pt)
@@ -345,14 +350,21 @@
     return 0;
   }
 
-  function recomputeAllTeams(round){
-    // on repart de zéro pour tous les joueurs actuellement dans une équipe
-    round.teams.forEach(t=>{ t.members.forEach(pid=>{ round.results[pid] = null; }); });
+  // Recalcule entièrement les points d'une manche (positions individuelles + équipes) à partir de zéro
+  function recomputeRound(round){
+    round.positions = round.positions || {};
+    round.participants = round.participants || state.players.map(p=>p.id);
+    round.teams = round.teams || [];
+    round.results = {};
+    const P = round.participants.length;
+    Object.entries(round.positions).forEach(([pid, rank])=>{
+      if(rank && round.participants.includes(pid)){ round.results[pid] = pointsForRank(rank, P); }
+    });
     const N = round.teams.length;
     round.teams.forEach(t=>{ if(t.position && t.position > N) t.position = null; });
     round.teams.forEach(t=>{
       if(t.position){
-        const pts = Math.max(0, teamPointsForRank(t.position, N) + sizeAdjustment(t, round.teams));
+        const pts = Math.max(0, teamPointsForRank(t.position, N, P) + sizeAdjustment(t, round.teams));
         t.members.forEach(pid=>{ round.results[pid] = pts; });
       }
     });
@@ -478,11 +490,16 @@
       const rounds = state.rounds[g.id] || [];
       const roundsHtml = rounds.map((round, ri) => {
         round.teams = round.teams || [];
+        round.positions = round.positions || {};
+        round.participants = round.participants || state.players.map(p=>p.id);
+        const participants = state.players.filter(p=>round.participants.includes(p.id));
         const pts = computeRoundPoints(g, round);
-        const rows = state.players.map(p=>{
+        const rows = participants.map(p=>{
           if(g.type === 'rank'){
-            const val = round.results[p.id] || '';
-            const opts = [1,2,3,4,5,6,7,8].map(n=>{ const pt=POINTS[n-1]; return `<option value="${pt}" ${val==pt?'selected':''}>${n}${n===1?'er':'e'} (${pt}pts)</option>`; }).join('');
+            const val = round.positions[p.id] || '';
+            const P = round.participants.length;
+            let opts = '';
+            for(let n=1;n<=P;n++){ const pt = pointsForRank(n,P); opts += `<option value="${n}" ${val==n?'selected':''}>${n}${n===1?'er':'e'} (${pt}pts)</option>`; }
             return `<div class="score-row"><span class="pname"><span class="color-dot" style="background:${p.color};width:10px;height:10px;"></span>${p.name}</span>
               <select data-round="${round.id}" data-game="${g.id}" data-pid="${p.id}" ${unlocked?'':'disabled'}><option value="">—</option>${opts}</select></div>`;
           } else {
@@ -494,13 +511,28 @@
           }
         }).join('');
 
+        const participantsRow = `<div class="participants-block">
+          <div class="team-builder-head">
+            <span class="lbl">👥 QUI PARTICIPE À CETTE MANCHE ? (${round.participants.length})</span>
+          </div>
+          <div class="team-members-row">
+            ${state.players.map(p=>{
+              const active = round.participants.includes(p.id);
+              return `<button type="button" class="member-chip ${active?'active':''}" style="${active?`background:${p.color};border-color:${p.color};`:''}"
+                data-toggpart="${p.id}" data-round="${round.id}" data-game="${g.id}" ${unlocked?'':'disabled'}>${p.name}</button>`;
+            }).join('')}
+          </div>
+          ${g.type==='rank' ? `<div class="hint" style="margin:8px 0 0;">→ 1er = ${firstPlacePoints(round.participants.length)} pts pour ${round.participants.length} participant${round.participants.length>1?'s':''}</div>` : ''}
+        </div>`;
+
         let teamBuilder = '';
         if(g.type === 'rank'){
           const N = round.teams.length;
+          const P = round.participants.length;
           const posOpts = (currentPos) => {
             let out = '<option value="">Position —</option>';
             for(let r=1;r<=N;r++){
-              const pt = teamPointsForRank(r,N);
+              const pt = teamPointsForRank(r,N,P);
               out += `<option value="${r}" ${currentPos==r?'selected':''}>${r}${r===1?'er':'e'} de ${N} (${pt}pts)</option>`;
             }
             return out;
@@ -519,7 +551,7 @@
               </div>
               ${adjLabel ? `<div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; margin:-4px 0 8px;">${adjLabel}</div>` : ''}
               <div class="team-members-row">
-                ${state.players.map(p=>{
+                ${participants.map(p=>{
                   const active = team.members.includes(p.id);
                   return `<button type="button" class="member-chip ${active?'active':''}" style="${active?`background:${p.color};border-color:${p.color};`:''}"
                     data-toggpid="${p.id}" data-team="${team.id}" data-round="${round.id}" data-game="${g.id}" ${unlocked?'':'disabled'}>${p.name}</button>`;
@@ -544,7 +576,7 @@
               ${unlocked ? `<button class="rm-btn" data-rmround="${round.id}" data-game="${g.id}" title="Supprimer la manche">✕</button>` : ''}
             </div>
           </div>
-          <div class="round-body" id="rb-${round.id}">${teamBuilder}${rows}</div>
+          <div class="round-body" id="rb-${round.id}">${participantsRow}${teamBuilder}${rows}</div>
         </div>`;
       }).join('');
 
@@ -571,7 +603,24 @@
       el.querySelectorAll('select[data-round]').forEach(sel=>{
         sel.addEventListener('change', e=>{
           const round = state.rounds[e.target.dataset.game].find(r=>r.id===e.target.dataset.round);
-          round.results[e.target.dataset.pid] = e.target.value ? +e.target.value : null;
+          round.positions[e.target.dataset.pid] = e.target.value ? +e.target.value : null;
+          recomputeRound(round);
+          saveState(); renderPodium(); renderTable(); renderGamesPreserveOpen();
+        });
+      });
+      el.querySelectorAll('[data-toggpart]').forEach(chip=>{
+        chip.addEventListener('click', ()=>{
+          const round = state.rounds[chip.dataset.game].find(r=>r.id===chip.dataset.round);
+          const pid = chip.dataset.toggpart;
+          const idx = round.participants.indexOf(pid);
+          if(idx >= 0){
+            round.participants.splice(idx, 1);
+            delete round.positions[pid];
+            round.teams.forEach(t=>{ t.members = t.members.filter(m=>m!==pid); });
+          } else {
+            round.participants.push(pid);
+          }
+          recomputeRound(round);
           saveState(); renderPodium(); renderTable(); renderGamesPreserveOpen();
         });
       });
@@ -593,7 +642,7 @@
         btn.addEventListener('click', ()=>{
           const list = state.rounds[btn.dataset.addround];
           const label = prompt('Nom de la manche :', 'Manche ' + (list.length+1)) || ('Manche ' + (list.length+1));
-          list.push({id:genId(), label, results:{}, teams:[]});
+          list.push({id:genId(), label, results:{}, teams:[], positions:{}, participants: state.players.map(p=>p.id)});
           saveState(); renderAll();
         });
       });
@@ -611,17 +660,15 @@
           round.teams = round.teams || [];
           const letter = String.fromCharCode(65 + round.teams.length);
           round.teams.push({id:genId(), label:'Équipe '+letter, position:null, members:[]});
-          recomputeAllTeams(round);
+          recomputeRound(round);
           saveState(); renderGamesPreserveOpen();
         });
       });
       el.querySelectorAll('[data-rmteam]').forEach(btn=>{
         btn.addEventListener('click', ()=>{
           const round = state.rounds[btn.dataset.game].find(r=>r.id===btn.dataset.round);
-          const team = round.teams.find(t=>t.id===btn.dataset.rmteam);
-          if(team) team.members.forEach(pid=>{ round.results[pid] = null; });
           round.teams = round.teams.filter(t=>t.id!==btn.dataset.rmteam);
-          recomputeAllTeams(round);
+          recomputeRound(round);
           saveState(); renderPodium(); renderTable(); renderGamesPreserveOpen();
         });
       });
@@ -630,7 +677,7 @@
           const round = state.rounds[e.target.dataset.game].find(r=>r.id===e.target.dataset.round);
           const team = round.teams.find(t=>t.id===e.target.dataset.team);
           team.position = e.target.value ? +e.target.value : null;
-          recomputeAllTeams(round);
+          recomputeRound(round);
           saveState(); renderPodium(); renderTable(); renderGamesPreserveOpen();
         });
       });
@@ -639,11 +686,10 @@
           const round = state.rounds[chip.dataset.game].find(r=>r.id===chip.dataset.round);
           const team = round.teams.find(t=>t.id===chip.dataset.team);
           const pid = chip.dataset.toggpid;
-          round.results[pid] = null;
           const wasInThisTeam = team.members.includes(pid);
           round.teams.forEach(t=>{ t.members = t.members.filter(m=>m!==pid); });
           if(!wasInThisTeam) team.members.push(pid);
-          recomputeAllTeams(round);
+          recomputeRound(round);
           saveState(); renderPodium(); renderTable(); renderGamesPreserveOpen();
         });
       });
