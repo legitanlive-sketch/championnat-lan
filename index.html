@@ -194,6 +194,16 @@
     </div>
 
     <div class="section">
+      <div class="section-head"><span class="tag">GÉNÉRAL</span><h2>Classement complet</h2></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr id="tableHead"></tr></thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="section">
       <div class="section-head"><span class="tag">ROSTER</span><h2>Joueurs</h2></div>
       <div class="players-grid" id="playersGrid"></div>
     </div>
@@ -202,16 +212,6 @@
       <div class="section-head"><span class="tag">ÉPREUVES</span><h2>Jeux du weekend</h2></div>
       <div class="hint">Chaque jeu peut avoir plusieurs manches — les points s'additionnent sur toutes les manches jouées.</div>
       <div class="games-grid" id="gamesGrid"></div>
-    </div>
-
-    <div class="section">
-      <div class="section-head"><span class="tag">GÉNÉRAL</span><h2>Classement complet</h2></div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr id="tableHead"></tr></thead>
-          <tbody id="tableBody"></tbody>
-        </table>
-      </div>
     </div>
 
     <footer>BARÈME DYNAMIQUE · LE 1ER GAGNE ~10 PTS × (NB JOUEURS ÷ 8) · RÉGLABLE PAR MANCHE</footer>
@@ -379,13 +379,25 @@
     return totals;
   }
 
+  // Nombre de manches où le joueur a effectivement un résultat enregistré (toutes épreuves confondues)
+  function countRoundsPlayed(pid){
+    let count = 0;
+    state.games.forEach(g=>{
+      (state.rounds[g.id]||[]).forEach(round=>{
+        const v = round.results && round.results[pid];
+        if(v !== undefined && v !== null && v !== ''){ count++; }
+      });
+    });
+    return count;
+  }
+
   function computeGrandTotals(){
     const totals = {}; state.players.forEach(p=>totals[p.id]=0);
     state.games.forEach(g=>{
       const gt = computeGameTotal(g);
       state.players.forEach(p=>{ totals[p.id]+=gt[p.id]||0; });
     });
-    return state.players.map(p=>({...p, total:totals[p.id]})).sort((a,b)=>b.total-a.total);
+    return state.players.map(p=>({...p, total:totals[p.id], played:countRoundsPlayed(p.id)})).sort((a,b)=>b.total-a.total);
   }
 
   // ---------- MODAL COLOR PICKER ----------
@@ -728,7 +740,7 @@
   // ---------- TABLE ----------
   function renderTable(){
     const head = document.getElementById('tableHead');
-    head.innerHTML = `<th>Rang</th><th>Joueur</th>` + state.games.map(g=>`<th>${g.name}</th>`).join('') + `<th>Total</th>`;
+    head.innerHTML = `<th>Rang</th><th>Joueur</th><th>Manches</th>` + state.games.map(g=>`<th>${g.name}</th>`).join('') + `<th>Total</th>`;
     const totals = computeGrandTotals();
     const gameTotalsByGame = {}; state.games.forEach(g=>gameTotalsByGame[g.id]=computeGameTotal(g));
     const medals = ['🥇','🥈','🥉'];
@@ -736,6 +748,7 @@
       <tr>
         <td class="rank-cell">${medals[rank]?`<span class="medal">${medals[rank]}</span>`:''}${rank+1}</td>
         <td><div class="pl-name-cell"><span class="color-dot" style="background:${p.color};width:10px;height:10px;"></span>${p.name}</div></td>
+        <td class="mono" style="color:var(--muted);">${p.played}</td>
         ${state.games.map(g=>`<td class="mono">${gameTotalsByGame[g.id][p.id] || '–'}</td>`).join('')}
         <td class="total-cell">${p.total}</td>
       </tr>`).join('');
