@@ -9,25 +9,24 @@
 <link href="https://fonts.googleapis.com/css2?family=Racing+Sans+One&family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --paper:#f3ead8; --card:#fbf6ec; --ink:#1d1a16; --muted:#7a6f5e;
-    --red:#c73a2a; --teal:#1e6a73; --mustard:#d99a1e;
-    --line:rgba(29,26,22,0.14); --soft:rgba(29,26,22,0.05);
-    --gold:#c9961a; --silver:#8e949b; --bronze:#a8652f;
-    --radius:14px;
+    --paper:#fff6e6; --card:#ffffff; --ink:#1a1530; --muted:#6f6789;
+    --night:#1a1530; --night-2:#2a2150;
+    --red:#e8322a; --orange:#ff7a1a; --yellow:#ffc629; --teal:#12a6b5; --blue:#2c5bd8; --green:#1f9a52;
+    --line:rgba(26,21,48,0.12); --soft:rgba(26,21,48,0.05);
+    --gold:#ffbf1f; --silver:#b9c3d0; --bronze:#d9844a;
+    --radius:16px; --shadow:0 6px 0 rgba(26,21,48,0.9);
   }
   @media (prefers-color-scheme: dark){
     :root:not([data-theme="light"]){
-      --paper:#17140f; --card:#211d17; --ink:#f3ead8; --muted:#a89c86;
-      --red:#e0533f; --teal:#4aa7b1; --mustard:#f0b93a;
-      --line:rgba(243,234,216,0.14); --soft:rgba(243,234,216,0.05);
-      --gold:#f0c24a; --silver:#c3c8ce; --bronze:#d48a4e;
+      --paper:#120f22; --card:#1d1838; --ink:#fff1dc; --muted:#a9a1c6;
+      --line:rgba(255,241,220,0.13); --soft:rgba(255,241,220,0.05);
+      --shadow:0 6px 0 rgba(0,0,0,0.6);
     }
   }
   :root[data-theme="dark"]{
-    --paper:#17140f; --card:#211d17; --ink:#f3ead8; --muted:#a89c86;
-    --red:#e0533f; --teal:#4aa7b1; --mustard:#f0b93a;
-    --line:rgba(243,234,216,0.14); --soft:rgba(243,234,216,0.05);
-    --gold:#f0c24a; --silver:#c3c8ce; --bronze:#d48a4e;
+    --paper:#120f22; --card:#1d1838; --ink:#fff1dc; --muted:#a9a1c6;
+    --line:rgba(255,241,220,0.13); --soft:rgba(255,241,220,0.05);
+    --shadow:0 6px 0 rgba(0,0,0,0.6);
   }
   *{ box-sizing:border-box; }
   html,body{ margin:0; padding:0; }
@@ -36,92 +35,122 @@
     font-family:'Barlow', sans-serif; font-size:15px; line-height:1.45;
     overflow-x:hidden; padding-bottom:70px;
   }
-  .cond{ font-family:'Barlow Condensed', sans-serif; letter-spacing:0.04em; }
   .num{ font-family:'Barlow Condensed', sans-serif; font-variant-numeric:tabular-nums; font-weight:700; }
   button{ font-family:inherit; }
 
   /* ---------- HERO ---------- */
-  .hero{ max-width:1100px; margin:0 auto; padding:34px 16px 22px; display:grid; grid-template-columns:1fr auto; align-items:end; gap:20px; }
-  .eyebrow{ font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:14px; letter-spacing:0.32em; color:var(--teal); text-transform:uppercase; }
-  .title{ font-family:'Racing Sans One', sans-serif; font-size:clamp(46px, 11vw, 104px); line-height:0.92; margin:6px 0 0; color:var(--red);
-    text-shadow:4px 4px 0 var(--ink); letter-spacing:0.01em; }
-  .title small{ display:block; font-size:0.42em; color:var(--ink); text-shadow:none; letter-spacing:0.04em; }
-  .tagline{ margin:12px 0 0; color:var(--muted); font-size:14px; max-width:420px; }
-  .hero-car{ width:min(360px, 40vw); height:auto; }
-  .checker{ height:16px; background:repeating-conic-gradient(var(--ink) 0 25%, var(--paper) 0 50%) 0 0/16px 16px; border-top:2px solid var(--ink); border-bottom:2px solid var(--ink); }
+  .hero-band{ position:relative; overflow:hidden; color:#fff1dc;
+    background:
+      radial-gradient(ellipse at 78% 40%, rgba(255,122,26,0.35), transparent 55%),
+      linear-gradient(160deg, var(--night-2) 0%, var(--night) 70%); }
+  .hero-band::before{ content:''; position:absolute; inset:-40% -10% auto auto; width:70%; height:180%;
+    background:repeating-linear-gradient(115deg, transparent 0 46px, rgba(255,198,41,0.10) 46px 70px, transparent 70px 120px, rgba(232,50,42,0.12) 120px 150px);
+    transform:skewX(-8deg); pointer-events:none; }
+  .stripes{ position:absolute; left:0; right:0; bottom:42px; height:34px; display:flex; flex-direction:column; transform:skewY(-2.5deg); transform-origin:left; pointer-events:none; }
+  .stripes span{ flex:1; }
+  .stripes span:nth-child(1){ background:var(--yellow); } .stripes span:nth-child(2){ background:var(--orange); } .stripes span:nth-child(3){ background:var(--red); }
+  .hero{ position:relative; max-width:1100px; margin:0 auto; padding:38px 16px 92px; display:grid; grid-template-columns:1fr 1.05fr; align-items:center; gap:10px; }
+  .eyebrow{ display:inline-block; font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:13px; letter-spacing:0.3em; text-transform:uppercase;
+    color:var(--night); background:var(--yellow); padding:4px 12px; border-radius:4px; transform:skewX(-10deg); }
+  .title{ font-family:'Racing Sans One', sans-serif; font-weight:400; font-size:clamp(56px, 12vw, 128px); line-height:0.88; margin:12px 0 0; color:#fff1dc;
+    text-shadow:3px 3px 0 var(--orange), 6px 6px 0 var(--red), 9px 9px 0 rgba(0,0,0,0.35); }
+  .title small{ display:block; font-size:0.36em; letter-spacing:0.06em; color:var(--yellow); text-shadow:2px 2px 0 var(--red); margin-bottom:4px; }
+  .tagline{ margin:18px 0 0; color:rgba(255,241,220,0.75); font-size:15px; max-width:400px; }
+  .hero-car{ width:100%; max-width:560px; height:auto; justify-self:end; filter:drop-shadow(0 18px 18px rgba(0,0,0,0.35)); animation:bob 2.6s ease-in-out infinite; }
+  @keyframes bob{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-4px); } }
+  .speed{ animation:dash 0.9s linear infinite; }
+  @keyframes dash{ from{ stroke-dashoffset:0; } to{ stroke-dashoffset:-60; } }
+  .spin{ transform-box:fill-box; transform-origin:center; animation:spin 0.6s linear infinite; }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce){ .hero-car,.speed,.spin{ animation:none; } }
+  .checker{ height:22px; background:repeating-conic-gradient(#1a1530 0 25%, #fff1dc 0 50%) 0 0/22px 22px; }
 
   .wrap{ max-width:1100px; margin:0 auto; padding:0 16px; }
-  .toolbar{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-top:18px; }
+  .toolbar{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-top:22px; }
   .lock-btn{ font-family:'Barlow Condensed',sans-serif; font-weight:700; letter-spacing:0.08em; font-size:13px; text-transform:uppercase;
-    background:var(--card); border:2px solid var(--ink); color:var(--ink); padding:7px 14px; border-radius:999px; cursor:pointer; }
-  .lock-btn.unlocked{ background:var(--mustard); color:#1d1a16; }
+    background:var(--card); border:2px solid var(--ink); color:var(--ink); padding:8px 16px; border-radius:999px; cursor:pointer; box-shadow:0 3px 0 var(--ink); }
+  .lock-btn:active{ transform:translateY(2px); box-shadow:0 1px 0 var(--ink); }
+  .lock-btn.unlocked{ background:var(--yellow); color:#1a1530; }
   .sync{ font-family:'Barlow Condensed',sans-serif; font-size:13px; letter-spacing:0.05em; color:var(--muted); }
 
   /* ---------- SEASONS ---------- */
-  .seasons{ display:flex; gap:8px; flex-wrap:wrap; margin-top:22px; align-items:center; }
-  .season-tab{ font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:16px; letter-spacing:0.05em; text-transform:uppercase;
-    padding:8px 16px; border-radius:999px; border:2px solid var(--ink); background:transparent; color:var(--ink); cursor:pointer; }
-  .season-tab.active{ background:var(--ink); color:var(--paper); }
+  .seasons{ display:flex; gap:10px; flex-wrap:wrap; margin-top:20px; align-items:center; }
+  .season-tab{ font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:17px; letter-spacing:0.05em; text-transform:uppercase;
+    padding:8px 18px; border-radius:8px; border:2px solid var(--ink); background:var(--card); color:var(--ink); cursor:pointer; transform:skewX(-8deg); }
+  .season-tab.active{ background:var(--red); border-color:var(--red); color:#fff; box-shadow:3px 3px 0 var(--ink); }
   .ghost-btn{ font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:14px; letter-spacing:0.06em; text-transform:uppercase;
-    padding:8px 14px; border-radius:999px; border:2px dashed var(--muted); background:transparent; color:var(--muted); cursor:pointer; }
-  .ghost-btn:hover{ border-color:var(--red); color:var(--red); }
+    padding:8px 14px; border-radius:8px; border:2px dashed var(--muted); background:transparent; color:var(--muted); cursor:pointer; }
+  .ghost-btn:hover{ border-color:var(--orange); color:var(--orange); }
 
   /* ---------- SECTIONS ---------- */
-  .section{ margin-top:44px; }
-  .section-head{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:16px; border-bottom:2px solid var(--ink); padding-bottom:8px; }
-  .section-head h2{ font-family:'Racing Sans One',sans-serif; font-weight:400; font-size:28px; margin:0; }
+  .section{ margin-top:48px; }
+  .section-head{ display:flex; align-items:flex-end; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:18px; }
+  .section-head h2{ font-family:'Racing Sans One',sans-serif; font-weight:400; font-size:32px; margin:0; line-height:1; position:relative; padding-bottom:10px; }
+  .section-head h2::after{ content:''; position:absolute; left:0; bottom:0; width:110%; height:6px;
+    background:linear-gradient(90deg, var(--yellow) 0 33%, var(--orange) 33% 66%, var(--red) 66%); transform:skewX(-20deg); border-radius:2px; }
   .section-head .sub{ font-family:'Barlow Condensed',sans-serif; color:var(--muted); font-size:15px; letter-spacing:0.04em; }
   .hint{ color:var(--muted); font-size:13px; }
-  .empty{ padding:26px; text-align:center; color:var(--muted); border:2px dashed var(--line); border-radius:var(--radius); }
+  .empty{ padding:28px; text-align:center; color:var(--muted); border:2px dashed var(--line); border-radius:var(--radius); background:var(--soft); }
 
-  .dot{ width:12px; height:12px; border-radius:50%; display:inline-block; flex-shrink:0; border:1.5px solid var(--ink); }
+  .dot{ width:13px; height:13px; border-radius:50%; display:inline-block; flex-shrink:0; border:2px solid var(--ink); }
 
   /* ---------- PODIUM ---------- */
-  .podium{ display:flex; align-items:flex-end; justify-content:center; gap:12px; }
-  .pod{ flex:1; max-width:230px; background:var(--card); border:2px solid var(--ink); border-radius:var(--radius) var(--radius) 0 0; text-align:center; padding:16px 10px 0; }
-  .pod .place{ font-family:'Racing Sans One',sans-serif; font-size:30px; line-height:1; }
-  .pod .name{ font-weight:600; margin:8px 0 2px; display:flex; align-items:center; justify-content:center; gap:6px; word-break:break-word; }
-  .pod .pts{ font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:24px; }
+  .podium{ display:flex; align-items:flex-end; justify-content:center; gap:14px; }
+  .pod{ flex:1; max-width:230px; background:var(--card); border:2px solid var(--ink); border-radius:var(--radius) var(--radius) 0 0; text-align:center; padding:18px 10px 0; position:relative; }
+  .pod .place{ font-family:'Racing Sans One',sans-serif; font-size:34px; line-height:1; }
+  .pod .name{ font-weight:600; font-size:16px; margin:8px 0 2px; display:flex; align-items:center; justify-content:center; gap:6px; word-break:break-word; }
+  .pod .pts{ font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:26px; }
   .pod .meta{ font-family:'Barlow Condensed',sans-serif; color:var(--muted); font-size:13px; letter-spacing:0.04em; }
-  .pod .step{ margin:12px -10px 0; border-top:2px solid var(--ink); }
-  .pod.p1{ order:2; } .pod.p1 .place{ color:var(--gold); } .pod.p1 .step{ height:70px; background:var(--gold); }
-  .pod.p2{ order:1; } .pod.p2 .place{ color:var(--silver); } .pod.p2 .step{ height:44px; background:var(--silver); }
-  .pod.p3{ order:3; } .pod.p3 .place{ color:var(--bronze); } .pod.p3 .step{ height:26px; background:var(--bronze); }
+  .pod .step{ margin:14px -10px 0; border-top:2px solid var(--ink); display:flex; align-items:center; justify-content:center;
+    font-family:'Racing Sans One',sans-serif; font-size:30px; color:rgba(26,21,48,0.35); }
+  .pod.p1{ order:2; box-shadow:0 0 0 4px var(--yellow); } .pod.p1 .place{ color:var(--red); }
+  .pod.p1 .step{ height:84px; background:linear-gradient(135deg, #ffe07a, var(--gold) 55%, #e09a00); }
+  .pod.p1::before{ content:'🏆'; position:absolute; top:-22px; left:50%; transform:translateX(-50%); font-size:30px; }
+  .pod.p2{ order:1; } .pod.p2 .place{ color:var(--blue); } .pod.p2 .step{ height:54px; background:linear-gradient(135deg, #eef2f7, var(--silver) 60%, #8f9bab); }
+  .pod.p3{ order:3; } .pod.p3 .place{ color:var(--orange); } .pod.p3 .step{ height:32px; background:linear-gradient(135deg, #f3b98c, var(--bronze) 60%, #a85a26); }
 
   /* ---------- TABLE ---------- */
-  .table-wrap{ overflow-x:auto; border:2px solid var(--ink); border-radius:var(--radius); background:var(--card); }
+  .table-wrap{ overflow-x:auto; border:2px solid var(--ink); border-radius:var(--radius); background:var(--card); box-shadow:var(--shadow); }
   table{ width:100%; border-collapse:collapse; }
   thead th{ font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:13px; letter-spacing:0.08em; text-transform:uppercase;
-    color:var(--muted); text-align:left; padding:12px 12px; border-bottom:2px solid var(--ink); white-space:nowrap; }
+    color:#fff1dc; background:var(--night); text-align:left; padding:12px; white-space:nowrap; }
   thead th.race-col{ text-align:center; }
-  thead th .circ{ display:block; font-size:11px; letter-spacing:0.04em; font-weight:500; }
-  tbody td{ padding:10px 12px; border-bottom:1px solid var(--line); white-space:nowrap; }
+  thead th .circ{ display:block; font-size:11px; letter-spacing:0.04em; font-weight:500; color:var(--yellow); }
+  tbody td{ padding:11px 12px; border-bottom:1px solid var(--line); white-space:nowrap; }
+  tbody tr:nth-child(even){ background:var(--soft); }
   tbody tr:last-child td{ border-bottom:none; }
+  tbody tr.top1 td:first-child{ box-shadow:inset 6px 0 0 var(--gold); }
+  tbody tr.top2 td:first-child{ box-shadow:inset 6px 0 0 var(--silver); }
+  tbody tr.top3 td:first-child{ box-shadow:inset 6px 0 0 var(--bronze); }
   td.c{ text-align:center; }
-  td.rank{ font-family:'Racing Sans One',sans-serif; font-size:20px; width:56px; }
-  td.total{ font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:20px; color:var(--red); }
+  td.rank{ font-family:'Racing Sans One',sans-serif; font-size:22px; width:60px; padding-left:18px; }
+  td.total{ font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:22px; color:var(--red); }
   .pl{ display:flex; align-items:center; gap:8px; font-weight:600; }
-  .win{ color:var(--mustard); font-weight:700; }
+  .win{ color:#fff !important; }
+  td.win span{ display:inline-block; min-width:28px; padding:1px 6px; border-radius:6px; background:var(--red); }
 
   /* ---------- RACES ---------- */
-  .races{ display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:16px; }
-  .race{ background:var(--card); border:2px solid var(--ink); border-radius:var(--radius); overflow:hidden; display:flex; flex-direction:column; }
-  .race-top{ display:flex; align-items:center; gap:12px; padding:12px 14px; background:var(--ink); color:var(--paper); }
-  .race-no{ font-family:'Racing Sans One',sans-serif; font-size:26px; width:44px; height:44px; border-radius:50%; background:var(--paper); color:var(--ink);
-    display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-  .race-top .circuit{ font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:20px; letter-spacing:0.05em; text-transform:uppercase; line-height:1.1; }
-  .race-top .lbl{ font-family:'Barlow Condensed',sans-serif; font-size:12px; letter-spacing:0.12em; text-transform:uppercase; opacity:0.7; }
-  .chips{ display:flex; flex-wrap:wrap; gap:6px; padding:10px 14px 0; }
-  .chip{ font-family:'Barlow Condensed',sans-serif; font-size:13px; letter-spacing:0.04em; padding:3px 10px; border-radius:999px; border:1.5px solid var(--line); color:var(--muted); }
-  .chip.weather{ border-color:var(--teal); color:var(--teal); }
+  .races{ display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:18px; }
+  .race{ background:var(--card); border:2px solid var(--ink); border-radius:var(--radius); overflow:hidden; display:flex; flex-direction:column; box-shadow:var(--shadow); }
+  .race-top{ position:relative; display:flex; align-items:center; gap:12px; padding:14px; background:var(--c, var(--night)); color:#fff; overflow:hidden; }
+  .race-top::after{ content:''; position:absolute; right:-20px; top:0; bottom:0; width:120px;
+    background:repeating-linear-gradient(115deg, rgba(255,255,255,0.18) 0 10px, transparent 10px 22px); }
+  .race-no{ font-family:'Racing Sans One',sans-serif; font-size:24px; width:46px; height:46px; border-radius:50%; background:#fff; color:#1a1530;
+    display:flex; align-items:center; justify-content:center; flex-shrink:0; border:3px solid #1a1530; }
+  .race-top .circuit{ font-family:'Racing Sans One',sans-serif; font-size:22px; line-height:1.1; }
+  .race-top .lbl{ font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:12px; letter-spacing:0.14em; text-transform:uppercase; opacity:0.85; }
+  .chips{ display:flex; flex-wrap:wrap; gap:6px; padding:12px 14px 0; }
+  .chip{ font-family:'Barlow Condensed',sans-serif; font-weight:600; font-size:13px; letter-spacing:0.04em; padding:3px 10px; border-radius:999px; background:var(--soft); color:var(--muted); }
+  .chip.weather{ background:var(--teal); color:#fff; }
   .race-body{ padding:12px 14px 14px; flex:1; }
   .result{ list-style:none; margin:0; padding:0; }
-  .result li{ display:flex; align-items:center; gap:10px; padding:6px 0; border-bottom:1px dashed var(--line); }
-  .result li:last-child{ border-bottom:none; }
-  .result .pos{ font-family:'Racing Sans One',sans-serif; width:26px; font-size:18px; }
-  .result .who{ flex:1; display:flex; align-items:center; gap:8px; font-weight:500; }
+  .result li{ display:flex; align-items:center; gap:10px; padding:7px 8px; border-radius:8px; }
+  .result li:nth-child(even){ background:var(--soft); }
+  .result .pos{ font-family:'Racing Sans One',sans-serif; width:26px; font-size:19px; }
+  .result .who{ flex:1; display:flex; align-items:center; gap:8px; font-weight:600; }
   .result .pts{ font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:16px; }
-  .result li.first .pos{ color:var(--gold); }
+  .result li.first{ background:linear-gradient(90deg, rgba(255,191,31,0.35), transparent); }
+  .result li.first .pos{ color:var(--red); }
 
   .field{ display:flex; flex-direction:column; gap:4px; margin-bottom:10px; }
   .field label, .block-lbl{ font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:12px; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); }
@@ -130,12 +159,12 @@
     width:100%; font-family:'Barlow',sans-serif; font-size:14px; color:var(--ink);
     background:var(--paper); border:1.5px solid var(--line); border-radius:8px; padding:7px 9px;
   }
-  input[type=text]:focus, select:focus{ outline:2px solid var(--teal); outline-offset:1px; }
+  input[type=text]:focus, select:focus{ outline:2px solid var(--orange); outline-offset:1px; }
   .block{ margin-top:6px; padding-top:12px; border-top:1px dashed var(--line); }
   .toggles{ display:flex; flex-wrap:wrap; gap:6px; margin:8px 0 4px; }
   .tog{ font-family:'Barlow Condensed',sans-serif; font-weight:600; font-size:14px; letter-spacing:0.03em; padding:5px 11px; border-radius:999px;
     border:1.5px solid var(--line); background:transparent; color:var(--muted); cursor:pointer; }
-  .tog.on{ color:#1d1a16; border-color:var(--ink); }
+  .tog.on{ color:#1a1530; border-color:#1a1530; }
   .pos-row{ display:flex; align-items:center; gap:10px; margin-top:8px; }
   .pos-row .who{ flex:1; display:flex; align-items:center; gap:8px; font-weight:500; min-width:0; }
   .pos-row select{ width:150px; }
@@ -144,21 +173,21 @@
     font-family:'Barlow Condensed',sans-serif; font-size:13px; letter-spacing:0.06em; color:var(--muted); cursor:pointer; text-align:center; }
   .del-link:hover{ color:var(--red); }
   .add-race{ border:2px dashed var(--muted); border-radius:var(--radius); background:transparent; color:var(--muted); cursor:pointer; min-height:160px;
-    font-family:'Racing Sans One',sans-serif; font-size:22px; }
-  .add-race:hover{ border-color:var(--red); color:var(--red); }
+    font-family:'Racing Sans One',sans-serif; font-size:24px; }
+  .add-race:hover{ border-color:var(--orange); color:var(--orange); background:rgba(255,122,26,0.06); }
 
   /* ---------- PLAYERS (edit) ---------- */
   .players{ display:grid; grid-template-columns:repeat(auto-fill, minmax(180px,1fr)); gap:10px; }
   .player{ display:flex; align-items:center; gap:8px; background:var(--card); border:2px solid var(--ink); border-radius:10px; padding:6px 8px; }
-  .player .swatch-btn{ width:22px; height:22px; border-radius:50%; border:2px solid var(--ink); cursor:pointer; flex-shrink:0; padding:0; }
+  .player .swatch-btn{ width:24px; height:24px; border-radius:50%; border:2px solid var(--ink); cursor:pointer; flex-shrink:0; padding:0; }
   .player input{ border:none; background:transparent; padding:4px 2px; min-width:0; }
   .x-btn{ border:none; background:none; color:var(--muted); cursor:pointer; font-size:15px; padding:2px 4px; }
   .x-btn:hover{ color:var(--red); }
   .season-name{ display:flex; align-items:center; gap:10px; margin-top:12px; max-width:420px; }
 
   /* ---------- MODAL ---------- */
-  .overlay{ position:fixed; inset:0; background:rgba(15,12,9,0.6); display:flex; align-items:center; justify-content:center; z-index:50; padding:16px; }
-  .modal{ background:var(--card); border:2px solid var(--ink); border-radius:16px; padding:20px; width:100%; max-width:340px; text-align:center; }
+  .overlay{ position:fixed; inset:0; background:rgba(15,12,30,0.65); display:flex; align-items:center; justify-content:center; z-index:50; padding:16px; }
+  .modal{ background:var(--card); border:2px solid var(--ink); border-radius:16px; padding:20px; width:100%; max-width:340px; text-align:center; box-shadow:var(--shadow); }
   .modal h3{ font-family:'Racing Sans One',sans-serif; font-weight:400; margin:0 0 14px; font-size:22px; }
   .swatches{ display:grid; grid-template-columns:repeat(6,1fr); gap:10px; }
   .swatch{ aspect-ratio:1; border-radius:50%; border:2px solid var(--ink); cursor:pointer; padding:0; }
@@ -167,44 +196,109 @@
 
   footer{ margin-top:50px; text-align:center; color:var(--muted); font-family:'Barlow Condensed',sans-serif; font-size:13px; letter-spacing:0.06em; }
 
-  @media (max-width:640px){
-    .hero{ grid-template-columns:1fr; }
-    .hero-car{ width:100%; max-width:320px; justify-self:center; }
+  @media (max-width:700px){
+    .hero{ grid-template-columns:1fr; padding-bottom:84px; }
+    .hero-car{ justify-self:center; }
     .field-row{ grid-template-columns:1fr; }
-    .pod .place{ font-size:24px; }
+    .pod .place{ font-size:26px; }
+    .pod .pts{ font-size:21px; }
   }
 </style>
 </head>
 <body>
 
+  <div class="hero-band">
   <header class="hero">
     <div>
-      <div class="eyebrow">Classement officiel du garage</div>
+      <span class="eyebrow">Plein gaz · Saison après saison</span>
       <h1 class="title"><small>Championnat</small>HEAT</h1>
       <p class="tagline">Saisons, courses et classement des pilotes — mis à jour en direct depuis la table de jeu.</p>
     </div>
-    <svg class="hero-car" viewBox="0 0 360 150" role="img" aria-label="Voiture de course des années 60">
-      <g stroke="var(--ink)" stroke-width="3" stroke-linecap="round">
-        <line x1="6" y1="70" x2="40" y2="70" opacity="0.5"/>
-        <line x1="0" y1="86" x2="28" y2="86" opacity="0.35"/>
-        <line x1="12" y1="102" x2="34" y2="102" opacity="0.5"/>
+    <svg class="hero-car" viewBox="0 0 560 230" role="img" aria-label="Voiture de course des années 60 lancée à pleine vitesse">
+      <defs>
+        <linearGradient id="body" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#ff6b57"/><stop offset="0.45" stop-color="#e8322a"/><stop offset="1" stop-color="#8f1611"/>
+        </linearGradient>
+        <radialGradient id="tire" cx="0.4" cy="0.35" r="0.7">
+          <stop offset="0" stop-color="#3a3360"/><stop offset="1" stop-color="#0e0b1c"/>
+        </radialGradient>
+        <radialGradient id="rim" cx="0.35" cy="0.3" r="0.8">
+          <stop offset="0" stop-color="#ffffff"/><stop offset="0.6" stop-color="#cfd5df"/><stop offset="1" stop-color="#8c95a6"/>
+        </radialGradient>
+        <linearGradient id="helmet" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#ffe27a"/><stop offset="1" stop-color="#f0a800"/>
+        </linearGradient>
+        <clipPath id="bodyClip">
+          <path d="M70 150 C66 128 92 116 140 113 L250 108 C270 90 318 88 340 104 L452 120 C500 126 538 136 548 150 C540 160 500 166 452 166 L190 174 C120 176 74 168 70 150 Z"/>
+        </clipPath>
+      </defs>
+
+      <g stroke="#fff1dc" stroke-width="4" stroke-linecap="round" opacity="0.55">
+        <line class="speed" x1="0" y1="112" x2="80" y2="112" stroke-dasharray="40 20"/>
+        <line class="speed" x1="10" y1="132" x2="64" y2="132" stroke-dasharray="30 30"/>
+        <line class="speed" x1="0" y1="186" x2="96" y2="186" stroke-dasharray="50 10"/>
       </g>
-      <ellipse cx="190" cy="132" rx="160" ry="8" fill="var(--ink)" opacity="0.12"/>
-      <path d="M44 74 L22 70 M44 80 L18 78" stroke="var(--ink)" stroke-width="5" stroke-linecap="round"/>
-      <path d="M44 92 C44 76 80 68 128 68 L262 66 C306 66 338 76 350 88 C344 98 306 104 262 104 L80 106 C58 106 44 102 44 92 Z"
-            fill="var(--red)" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round"/>
-      <path d="M128 68 L262 66" stroke="var(--paper)" stroke-width="4" opacity="0.55"/>
-      <path d="M160 68 Q178 46 202 66" fill="none" stroke="var(--ink)" stroke-width="3"/>
-      <circle cx="182" cy="56" r="13" fill="var(--teal)" stroke="var(--ink)" stroke-width="3"/>
-      <path d="M184 51 h10 v7 h-10 z" fill="var(--paper)" stroke="var(--ink)" stroke-width="2"/>
-      <circle cx="238" cy="86" r="14" fill="var(--paper)" stroke="var(--ink)" stroke-width="3"/>
-      <text x="238" y="92" text-anchor="middle" font-family="Racing Sans One, sans-serif" font-size="17" fill="var(--ink)">7</text>
-      <circle cx="96" cy="106" r="27" fill="var(--ink)"/>
-      <circle cx="96" cy="106" r="11" fill="var(--mustard)" stroke="var(--ink)" stroke-width="3"/>
-      <circle cx="298" cy="106" r="23" fill="var(--ink)"/>
-      <circle cx="298" cy="106" r="9" fill="var(--mustard)" stroke="var(--ink)" stroke-width="3"/>
+      <ellipse cx="300" cy="208" rx="250" ry="11" fill="#000" opacity="0.35"/>
+
+      <!-- échappements -->
+      <circle cx="26" cy="134" r="9" fill="#fff1dc" opacity="0.25"/>
+      <circle cx="10" cy="124" r="6" fill="#fff1dc" opacity="0.15"/>
+      <path d="M100 144 L44 136 M100 156 L40 152" stroke="#9aa0b4" stroke-width="8" stroke-linecap="round"/>
+      <circle cx="42" cy="136" r="4" fill="#1a1530"/><circle cx="38" cy="152" r="4" fill="#1a1530"/>
+
+      <!-- suspensions -->
+      <path d="M190 146 L150 166 M200 160 L150 166 M418 140 L452 170 M410 156 L452 170" stroke="#1a1530" stroke-width="4" stroke-linecap="round"/>
+
+      <!-- arceau -->
+      <path d="M266 108 L270 76 Q276 68 284 76 L288 106" fill="none" stroke="#1a1530" stroke-width="6" stroke-linejoin="round"/>
+
+      <!-- carrosserie -->
+      <path d="M70 150 C66 128 92 116 140 113 L250 108 C270 90 318 88 340 104 L452 120 C500 126 538 136 548 150 C540 160 500 166 452 166 L190 174 C120 176 74 168 70 150 Z"
+            fill="url(#body)" stroke="#1a1530" stroke-width="4" stroke-linejoin="round"/>
+      <g clip-path="url(#bodyClip)">
+        <path d="M60 142 Q300 126 560 148" stroke="#ffc629" stroke-width="7" fill="none"/>
+        <path d="M60 152 Q300 136 560 158" stroke="#fff1dc" stroke-width="4" fill="none"/>
+        <path d="M110 121 Q300 106 480 128" stroke="#ffffff" stroke-width="4" fill="none" opacity="0.45"/>
+      </g>
+      <ellipse cx="545" cy="150" rx="4" ry="8" fill="#1a1530"/>
+
+      <!-- habitacle et pilote -->
+      <path d="M262 108 C276 96 314 94 334 106 Z" fill="#1a1530"/>
+      <circle cx="300" cy="88" r="18" fill="url(#helmet)" stroke="#1a1530" stroke-width="3.5"/>
+      <path d="M284 80 Q300 70 316 80" stroke="#e8322a" stroke-width="4" fill="none"/>
+      <rect x="303" y="83" width="16" height="10" rx="4" fill="#1a1530"/>
+      <rect x="307" y="85" width="6" height="3" rx="1.5" fill="#7fd6e0"/>
+      <path d="M320 106 L332 84 Q344 86 350 106 Z" fill="#bfe9f0" fill-opacity="0.75" stroke="#1a1530" stroke-width="3" stroke-linejoin="round"/>
+
+      <!-- numéro -->
+      <circle cx="402" cy="140" r="18" fill="#fff1dc" stroke="#1a1530" stroke-width="3.5"/>
+      <text x="402" y="148" text-anchor="middle" font-family="Racing Sans One, sans-serif" font-size="23" fill="#1a1530">7</text>
+
+      <!-- roues -->
+      <g>
+        <circle cx="150" cy="166" r="40" fill="url(#tire)" stroke="#1a1530" stroke-width="3"/>
+        <circle cx="150" cy="166" r="32" fill="none" stroke="#4b437a" stroke-width="2"/>
+        <circle cx="150" cy="166" r="22" fill="url(#rim)" stroke="#1a1530" stroke-width="3"/>
+        <g class="spin" stroke="#6f7890" stroke-width="2.5" stroke-linecap="round">
+          <line x1="150" y1="146" x2="150" y2="186"/><line x1="130" y1="166" x2="170" y2="166"/>
+          <line x1="136" y1="152" x2="164" y2="180"/><line x1="164" y1="152" x2="136" y2="180"/>
+        </g>
+        <circle cx="150" cy="166" r="6" fill="#e8322a" stroke="#1a1530" stroke-width="2"/>
+      </g>
+      <g>
+        <circle cx="452" cy="172" r="33" fill="url(#tire)" stroke="#1a1530" stroke-width="3"/>
+        <circle cx="452" cy="172" r="26" fill="none" stroke="#4b437a" stroke-width="2"/>
+        <circle cx="452" cy="172" r="18" fill="url(#rim)" stroke="#1a1530" stroke-width="3"/>
+        <g class="spin" stroke="#6f7890" stroke-width="2.5" stroke-linecap="round">
+          <line x1="452" y1="156" x2="452" y2="188"/><line x1="436" y1="172" x2="468" y2="172"/>
+          <line x1="441" y1="161" x2="463" y2="183"/><line x1="463" y1="161" x2="441" y2="183"/>
+        </g>
+        <circle cx="452" cy="172" r="5" fill="#e8322a" stroke="#1a1530" stroke-width="2"/>
+      </g>
     </svg>
   </header>
+  <div class="stripes" aria-hidden="true"><span></span><span></span><span></span></div>
+  </div>
   <div class="checker" aria-hidden="true"></div>
 
   <main class="wrap">
@@ -400,7 +494,7 @@
         <div class="name"><span class="dot" style="background:${p.color}"></span>${esc(p.name)}</div>
         <div class="pts">${r.total} pts</div>
         <div class="meta">${r.wins} victoire${r.wins>1?'s':''} · ${r.races} course${r.races>1?'s':''}</div>
-        <div class="step"></div></div>`;
+        <div class="step">${i+1}</div></div>`;
     }).join('')}</div>`;
   }
 
@@ -421,10 +515,10 @@
         <th>Total</th></tr></thead>
       <tbody>${list.map(row=>{
         const p = player(row.pid);
-        return `<tr><td class="rank">${row.rank}</td>
+        return `<tr class="${row.rank<=3?'top'+row.rank:''}"><td class="rank">${row.rank}</td>
           <td><div class="pl"><span class="dot" style="background:${p.color}"></span>${esc(p.name)}</div></td>
           <td class="c num">${row.races}</td><td class="c num">${row.wins}</td><td class="c num">${row.podiums}</td>
-          ${races.map(r=>{ const x = row.per[r.id]; return `<td class="c num ${x&&x.rank===1?'win':''}" title="${x?x.rank+'e':''}">${x? x.pts : '–'}</td>`; }).join('')}
+          ${races.map(r=>{ const x = row.per[r.id]; return `<td class="c num ${x&&x.rank===1?'win':''}" title="${x?x.rank+'e':''}">${x ? (x.rank===1 ? `<span>${x.pts}</span>` : x.pts) : '–'}</td>`; }).join('')}
           <td class="total">${row.total}</td></tr>`;
       }).join('')}</tbody></table></div>`;
   }
@@ -449,8 +543,15 @@
     });
   }
 
+  function circuitColor(c){
+    const map = { 'USA':'#2c5bd8', 'Grande-Bretagne':'#1f9a52', 'France':'#12a6b5', 'Italie':'#e8322a' };
+    if(map[c]) return map[c];
+    const extra = ['#ff7a1a','#8a3ffc','#d9346f','#0f8b8d','#c98a00'];
+    let n = 0; for(const ch of (c||'')) n = (n*31 + ch.charCodeAt(0)) >>> 0;
+    return c ? extra[n % extra.length] : 'var(--night)';
+  }
   function raceHeader(race,i){
-    return `<div class="race-top"><div class="race-no">${i+1}</div>
+    return `<div class="race-top" style="--c:${circuitColor(race.circuit)}"><div class="race-no">${i+1}</div>
       <div><div class="lbl">Course ${i+1}</div><div class="circuit">${esc(race.circuit || 'Circuit à définir')}</div></div></div>`;
   }
   function raceChips(race){
