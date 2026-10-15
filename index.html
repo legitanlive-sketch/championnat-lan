@@ -3,793 +3,582 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Championnat LAN — Classement</title>
+<title>Championnat Heat</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Racing+Sans+One&family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg-1:#0a0a1a; --bg-2:#140f2b; --bg-3:#1b1338;
-    --cyan:#00e5ff; --cyan-dim: rgba(0,229,255,0.35);
-    --magenta:#ff2e92; --magenta-dim: rgba(255,46,146,0.35);
-    --gold:#ffc35a; --silver:#cdd6e5; --bronze:#e0995e;
-    --text:#f2f0fb; --muted:#8d89ac;
-    --card-bg: rgba(255,255,255,0.045); --card-border: rgba(255,255,255,0.09);
-    --radius: 16px;
+    --paper:#f3ead8; --card:#fbf6ec; --ink:#1d1a16; --muted:#7a6f5e;
+    --red:#c73a2a; --teal:#1e6a73; --mustard:#d99a1e;
+    --line:rgba(29,26,22,0.14); --soft:rgba(29,26,22,0.05);
+    --gold:#c9961a; --silver:#8e949b; --bronze:#a8652f;
+    --radius:14px;
   }
-  *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#17140f; --card:#211d17; --ink:#f3ead8; --muted:#a89c86;
+      --red:#e0533f; --teal:#4aa7b1; --mustard:#f0b93a;
+      --line:rgba(243,234,216,0.14); --soft:rgba(243,234,216,0.05);
+      --gold:#f0c24a; --silver:#c3c8ce; --bronze:#d48a4e;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#17140f; --card:#211d17; --ink:#f3ead8; --muted:#a89c86;
+    --red:#e0533f; --teal:#4aa7b1; --mustard:#f0b93a;
+    --line:rgba(243,234,216,0.14); --soft:rgba(243,234,216,0.05);
+    --gold:#f0c24a; --silver:#c3c8ce; --bronze:#d48a4e;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
   body{
-    background: radial-gradient(ellipse at 50% -10%, #221a45 0%, var(--bg-2) 45%, var(--bg-1) 100%);
-    color:var(--text); font-family:'Space Grotesk', sans-serif;
-    min-height:100vh; overflow-x:hidden; padding-bottom:80px;
+    background:var(--paper); color:var(--ink);
+    font-family:'Barlow', sans-serif; font-size:15px; line-height:1.45;
+    overflow-x:hidden; padding-bottom:70px;
   }
-  h1,h2,h3, .display{ font-family:'Orbitron', sans-serif; letter-spacing:0.03em; }
-  .mono{ font-family:'JetBrains Mono', monospace; }
+  .cond{ font-family:'Barlow Condensed', sans-serif; letter-spacing:0.04em; }
+  .num{ font-family:'Barlow Condensed', sans-serif; font-variant-numeric:tabular-nums; font-weight:700; }
+  button{ font-family:inherit; }
 
-  .hero{ position:relative; height:300px; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; overflow:hidden; border-bottom:1px solid var(--card-border);}
-  .grid-floor{ position:absolute; bottom:0; left:0; right:0; height:60%;
-    background-image: linear-gradient(var(--cyan-dim) 1px, transparent 1px), linear-gradient(90deg, var(--cyan-dim) 1px, transparent 1px);
-    background-size: 48px 48px; transform: perspective(260px) rotateX(62deg); transform-origin:bottom; opacity:0.55;
-    animation: floorMove 5s linear infinite;
-    mask-image: linear-gradient(to top, black 30%, transparent 95%); -webkit-mask-image: linear-gradient(to top, black 30%, transparent 95%);
-  }
-  @keyframes floorMove{ from{ background-position: 0 0, 0 0; } to{ background-position: 0 48px, 0 0; } }
-  .hero-glow{ position:absolute; top:-140px; left:50%; transform:translateX(-50%); width:640px; height:640px;
-    background: radial-gradient(circle, var(--magenta-dim) 0%, transparent 65%); filter: blur(10px); pointer-events:none; }
-  .hero-content{ position:relative; z-index:2; text-align:center; padding-bottom:30px; }
-  .eyebrow{ color:var(--cyan); font-family:'JetBrains Mono', monospace; font-size:12px; letter-spacing:0.35em; text-transform:uppercase; margin-bottom:10px; }
-  .hero h1{ font-size:clamp(26px, 6vw, 48px); margin:0;
-    background:linear-gradient(90deg, var(--cyan), #b6f2ff 40%, var(--magenta)); -webkit-background-clip:text; background-clip:text; color:transparent;
-    text-shadow: 0 0 40px rgba(0,229,255,0.25); }
-  .hero p{ color:var(--muted); margin-top:10px; font-size:14px; }
+  /* ---------- HERO ---------- */
+  .hero{ max-width:1100px; margin:0 auto; padding:34px 16px 22px; display:grid; grid-template-columns:1fr auto; align-items:end; gap:20px; }
+  .eyebrow{ font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:14px; letter-spacing:0.32em; color:var(--teal); text-transform:uppercase; }
+  .title{ font-family:'Racing Sans One', sans-serif; font-size:clamp(46px, 11vw, 104px); line-height:0.92; margin:6px 0 0; color:var(--red);
+    text-shadow:4px 4px 0 var(--ink); letter-spacing:0.01em; }
+  .title small{ display:block; font-size:0.42em; color:var(--ink); text-shadow:none; letter-spacing:0.04em; }
+  .tagline{ margin:12px 0 0; color:var(--muted); font-size:14px; max-width:420px; }
+  .hero-car{ width:min(360px, 40vw); height:auto; }
+  .checker{ height:16px; background:repeating-conic-gradient(var(--ink) 0 25%, var(--paper) 0 50%) 0 0/16px 16px; border-top:2px solid var(--ink); border-bottom:2px solid var(--ink); }
 
-  .lockbar{ display:flex; justify-content:center; margin-top:-1px; }
-  .lock-btn{
-    font-family:'JetBrains Mono',monospace; font-size:11.5px; letter-spacing:0.06em;
-    background:var(--card-bg); border:1px solid var(--card-border); color:var(--muted);
-    padding:8px 16px; border-radius:0 0 12px 12px; cursor:pointer; margin-top:0;
-  }
-  .lock-btn.unlocked{ color:var(--gold); border-color:rgba(255,195,90,0.4); }
-  .sync-status{ font-size:10.5px; align-self:center; margin-left:10px; letter-spacing:0.04em; }
+  .wrap{ max-width:1100px; margin:0 auto; padding:0 16px; }
+  .toolbar{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-top:18px; }
+  .lock-btn{ font-family:'Barlow Condensed',sans-serif; font-weight:700; letter-spacing:0.08em; font-size:13px; text-transform:uppercase;
+    background:var(--card); border:2px solid var(--ink); color:var(--ink); padding:7px 14px; border-radius:999px; cursor:pointer; }
+  .lock-btn.unlocked{ background:var(--mustard); color:#1d1a16; }
+  .sync{ font-family:'Barlow Condensed',sans-serif; font-size:13px; letter-spacing:0.05em; color:var(--muted); }
 
-  .wrap{ max-width:1100px; margin:0 auto; padding:0 24px; }
-  .section{ margin-top:56px; }
-  .section-head{ display:flex; align-items:baseline; gap:12px; margin-bottom:20px; }
-  .section-head .tag{ font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--bg-1);
-    background:linear-gradient(90deg, var(--cyan), var(--magenta)); padding:3px 9px; border-radius:20px; font-weight:700; }
-  .section-head h2{ font-size:20px; margin:0; }
-  .hint{ color:var(--muted); font-size:12px; margin:-12px 0 18px; font-family:'JetBrains Mono',monospace;}
+  /* ---------- SEASONS ---------- */
+  .seasons{ display:flex; gap:8px; flex-wrap:wrap; margin-top:22px; align-items:center; }
+  .season-tab{ font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:16px; letter-spacing:0.05em; text-transform:uppercase;
+    padding:8px 16px; border-radius:999px; border:2px solid var(--ink); background:transparent; color:var(--ink); cursor:pointer; }
+  .season-tab.active{ background:var(--ink); color:var(--paper); }
+  .ghost-btn{ font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:14px; letter-spacing:0.06em; text-transform:uppercase;
+    padding:8px 14px; border-radius:999px; border:2px dashed var(--muted); background:transparent; color:var(--muted); cursor:pointer; }
+  .ghost-btn:hover{ border-color:var(--red); color:var(--red); }
 
-  .podium{ display:flex; align-items:flex-end; justify-content:center; gap:16px; margin-top:10px; }
-  .pod-slot{ flex:1; max-width:220px; background:var(--card-bg); border:1px solid var(--card-border); border-radius: var(--radius);
-    padding:18px 14px 20px; text-align:center; position:relative; backdrop-filter: blur(6px); }
-  .pod-slot.p1{ order:2; padding-top:30px; box-shadow:0 0 40px rgba(255,195,90,0.18); border-color:rgba(255,195,90,0.4);}
-  .pod-slot.p2{ order:1; box-shadow:0 0 30px rgba(205,214,229,0.1); border-color:rgba(205,214,229,0.3);}
-  .pod-slot.p3{ order:3; box-shadow:0 0 30px rgba(224,153,94,0.12); border-color:rgba(224,153,94,0.3);}
-  .pod-rank{ font-family:'Orbitron',sans-serif; font-weight:800; font-size:13px; letter-spacing:0.2em; margin-bottom:6px; }
-  .p1 .pod-rank{ color:var(--gold); } .p2 .pod-rank{ color:var(--silver); } .p3 .pod-rank{ color:var(--bronze); }
-  .pod-dot{ width:10px; height:10px; border-radius:50%; display:inline-block; margin-right:6px; }
-  .pod-name{ font-size:16px; font-weight:600; margin:6px 0 4px; word-break:break-word; }
-  .pod-pts{ font-family:'JetBrains Mono',monospace; font-size:22px; font-weight:700; }
-  .p1 .pod-pts{ color:var(--gold); } .p2 .pod-pts{ color:var(--silver); } .p3 .pod-pts{ color:var(--bronze); }
-  .pod-bar{ margin-top:12px; border-radius:8px 8px 0 0; background:linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02)); }
-  .p1 .pod-bar{ height:64px; } .p2 .pod-bar{ height:40px; } .p3 .pod-bar{ height:24px; }
+  /* ---------- SECTIONS ---------- */
+  .section{ margin-top:44px; }
+  .section-head{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:16px; border-bottom:2px solid var(--ink); padding-bottom:8px; }
+  .section-head h2{ font-family:'Racing Sans One',sans-serif; font-weight:400; font-size:28px; margin:0; }
+  .section-head .sub{ font-family:'Barlow Condensed',sans-serif; color:var(--muted); font-size:15px; letter-spacing:0.04em; }
+  .hint{ color:var(--muted); font-size:13px; }
+  .empty{ padding:26px; text-align:center; color:var(--muted); border:2px dashed var(--line); border-radius:var(--radius); }
 
-  .players-grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(160px,1fr)); gap:10px; }
-  .player-chip{ background:var(--card-bg); border:1px solid var(--card-border); border-radius:10px; padding:8px 10px;
-    display:flex; align-items:center; gap:8px; }
-  .color-dot{ width:16px; height:16px; border-radius:50%; flex-shrink:0; border:1px solid rgba(255,255,255,0.3); }
-  .color-dot.editable{ cursor:pointer; }
-  .player-chip input{ flex:1; width:100%; background:transparent; border:none; color:var(--text);
-    font-family:'Space Grotesk',sans-serif; font-size:13px; outline:none; min-width:0; }
-  .player-chip input:disabled{ color:var(--text); opacity:0.9; }
-  .rm-btn{ background:none; border:none; color:var(--muted); cursor:pointer; font-size:14px; padding:0 2px; }
-  .rm-btn:hover{ color:var(--magenta); }
-  .add-player-card{ border:1.5px dashed var(--card-border); border-radius:10px; display:flex; align-items:center; justify-content:center;
-    color:var(--muted); cursor:pointer; font-family:'JetBrains Mono',monospace; font-size:12px; padding:8px 10px; transition: border-color .2s, color .2s;}
-  .add-player-card:hover{ border-color:var(--magenta); color:var(--magenta); }
+  .dot{ width:12px; height:12px; border-radius:50%; display:inline-block; flex-shrink:0; border:1.5px solid var(--ink); }
 
-  .games-grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:16px; }
-  .game-card{ background:var(--card-bg); border:1px solid var(--card-border); border-radius:var(--radius); padding:20px; }
-  .game-top{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px;}
-  .game-icon{ width:40px; height:40px; margin-bottom:10px; }
-  .game-card h3{ font-size:16px; margin:0 0 4px; }
-  .game-card .desc{ color:var(--muted); font-size:12.5px; margin-bottom:14px; }
-  .add-round-btn{ background:transparent; border:1px solid var(--cyan-dim); color:var(--cyan); font-family:'JetBrains Mono',monospace;
-    font-size:11px; letter-spacing:0.04em; padding:7px 10px; border-radius:9px; cursor:pointer; white-space:nowrap; }
-  .add-round-btn:hover{ background:var(--cyan); color:var(--bg-1); }
+  /* ---------- PODIUM ---------- */
+  .podium{ display:flex; align-items:flex-end; justify-content:center; gap:12px; }
+  .pod{ flex:1; max-width:230px; background:var(--card); border:2px solid var(--ink); border-radius:var(--radius) var(--radius) 0 0; text-align:center; padding:16px 10px 0; }
+  .pod .place{ font-family:'Racing Sans One',sans-serif; font-size:30px; line-height:1; }
+  .pod .name{ font-weight:600; margin:8px 0 2px; display:flex; align-items:center; justify-content:center; gap:6px; word-break:break-word; }
+  .pod .pts{ font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:24px; }
+  .pod .meta{ font-family:'Barlow Condensed',sans-serif; color:var(--muted); font-size:13px; letter-spacing:0.04em; }
+  .pod .step{ margin:12px -10px 0; border-top:2px solid var(--ink); }
+  .pod.p1{ order:2; } .pod.p1 .place{ color:var(--gold); } .pod.p1 .step{ height:70px; background:var(--gold); }
+  .pod.p2{ order:1; } .pod.p2 .place{ color:var(--silver); } .pod.p2 .step{ height:44px; background:var(--silver); }
+  .pod.p3{ order:3; } .pod.p3 .place{ color:var(--bronze); } .pod.p3 .step{ height:26px; background:var(--bronze); }
 
-  .round{ border-top:1px dashed var(--card-border); margin-top:14px; padding-top:12px; }
-  .round-head{ display:flex; align-items:center; justify-content:space-between; cursor:pointer; }
-  .round-head .rlabel{ font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text); }
-  .round-head .rmeta{ color:var(--muted); font-size:11px; }
-  .round-actions{ display:flex; align-items:center; gap:8px; }
-  .round-body{ display:none; margin-top:10px; }
-  .round-body.open{ display:block; }
-  .score-row{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:7px; }
-  .score-row .pname{ font-size:12.5px; flex:1; display:flex; align-items:center; gap:6px; }
-  .score-row select, .score-row input.time-input{
-    background:var(--bg-3); color:var(--text); border:1px solid var(--card-border); border-radius:8px;
-    padding:5px 8px; font-family:'JetBrains Mono',monospace; font-size:12px; width:135px;
-  }
-  .score-row input.time-input::placeholder{ color:var(--muted); }
-  .badge-pts{ font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--gold); min-width:64px; text-align:right; }
-
-  .team-builder{ margin-bottom:14px; }
-  .participants-block{ margin-bottom:14px; padding-bottom:14px; border-bottom:1px dashed var(--card-border); }
-  .teammode-toggle{ display:flex; align-items:center; gap:8px; margin-top:10px; font-family:'JetBrains Mono',monospace;
-    font-size:11.5px; color:var(--text); cursor:pointer; }
-  .teammode-toggle input{ width:15px; height:15px; accent-color:var(--magenta); cursor:pointer; }
-  .team-builder-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
-  .team-builder-head .lbl{ font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted); letter-spacing:0.05em; }
-  .add-team-btn{ background:transparent; border:1px solid var(--magenta-dim); color:var(--magenta); font-family:'JetBrains Mono',monospace;
-    font-size:10.5px; padding:5px 9px; border-radius:8px; cursor:pointer; }
-  .add-team-btn:hover{ background:var(--magenta); color:var(--bg-1); }
-  .team-block{ border:1px solid var(--card-border); border-radius:10px; padding:10px; margin-bottom:8px; background:rgba(255,255,255,0.02); }
-  .team-head{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:8px; }
-  .team-label{ font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--cyan); }
-  .team-head select{ background:var(--bg-3); color:var(--text); border:1px solid var(--card-border); border-radius:8px;
-    padding:4px 7px; font-family:'JetBrains Mono',monospace; font-size:11.5px; }
-  .team-members-row{ display:flex; flex-wrap:wrap; gap:6px; }
-  .member-chip{ font-family:'Space Grotesk',sans-serif; font-size:11.5px; padding:5px 10px; border-radius:20px;
-    border:1px solid var(--card-border); background:transparent; color:var(--muted); cursor:pointer; transition:.15s; }
-  .member-chip.active{ font-weight:600; color:#0a0a1a; }
-  .member-chip:disabled{ cursor:default; opacity:0.7; }
-
-  .add-card{ border:1.5px dashed var(--card-border); border-radius:var(--radius); display:flex; align-items:center; justify-content:center;
-    flex-direction:column; gap:8px; color:var(--muted); cursor:pointer; min-height:170px; font-family:'JetBrains Mono',monospace; font-size:12px;
-    transition: border-color .2s ease, color .2s ease; }
-  .add-card:hover{ border-color:var(--magenta); color:var(--magenta); }
-  .add-card .plus{ font-size:30px; font-family:'Orbitron',sans-serif; }
-  .locked-msg{ color:var(--muted); font-size:11px; font-family:'JetBrains Mono',monospace; text-align:center; padding:10px; }
-  .delete-game-link{ margin-top:16px; padding-top:12px; border-top:1px dashed var(--card-border);
-    color:var(--muted); font-size:11px; font-family:'JetBrains Mono',monospace; text-align:center;
-    cursor:pointer; letter-spacing:0.03em; transition: color .15s; }
-  .delete-game-link:hover{ color:var(--magenta); }
-
-  .table-wrap{ overflow-x:auto; border:1px solid var(--card-border); border-radius:var(--radius); background:var(--card-bg); }
-  table{ width:100%; border-collapse:collapse; min-width:560px; }
-  thead th{ text-align:left; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.08em; color:var(--muted);
-    text-transform:uppercase; padding:14px 16px; border-bottom:1px solid var(--card-border); white-space:nowrap; }
-  tbody td{ padding:12px 16px; font-size:13.5px; border-bottom:1px solid rgba(255,255,255,0.04); white-space:nowrap; }
+  /* ---------- TABLE ---------- */
+  .table-wrap{ overflow-x:auto; border:2px solid var(--ink); border-radius:var(--radius); background:var(--card); }
+  table{ width:100%; border-collapse:collapse; }
+  thead th{ font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:13px; letter-spacing:0.08em; text-transform:uppercase;
+    color:var(--muted); text-align:left; padding:12px 12px; border-bottom:2px solid var(--ink); white-space:nowrap; }
+  thead th.race-col{ text-align:center; }
+  thead th .circ{ display:block; font-size:11px; letter-spacing:0.04em; font-weight:500; }
+  tbody td{ padding:10px 12px; border-bottom:1px solid var(--line); white-space:nowrap; }
   tbody tr:last-child td{ border-bottom:none; }
-  tbody tr:hover{ background:rgba(255,255,255,0.02); }
-  .rank-cell{ font-family:'JetBrains Mono',monospace; font-weight:700; }
-  .medal{ font-size:15px; margin-right:4px; }
-  .total-cell{ font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--cyan); }
-  .pl-name-cell{ display:flex; align-items:center; gap:8px; }
+  td.c{ text-align:center; }
+  td.rank{ font-family:'Racing Sans One',sans-serif; font-size:20px; width:56px; }
+  td.total{ font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:20px; color:var(--red); }
+  .pl{ display:flex; align-items:center; gap:8px; font-weight:600; }
+  .win{ color:var(--mustard); font-weight:700; }
 
-  footer{ text-align:center; margin-top:60px; color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.1em; }
+  /* ---------- RACES ---------- */
+  .races{ display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:16px; }
+  .race{ background:var(--card); border:2px solid var(--ink); border-radius:var(--radius); overflow:hidden; display:flex; flex-direction:column; }
+  .race-top{ display:flex; align-items:center; gap:12px; padding:12px 14px; background:var(--ink); color:var(--paper); }
+  .race-no{ font-family:'Racing Sans One',sans-serif; font-size:26px; width:44px; height:44px; border-radius:50%; background:var(--paper); color:var(--ink);
+    display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .race-top .circuit{ font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:20px; letter-spacing:0.05em; text-transform:uppercase; line-height:1.1; }
+  .race-top .lbl{ font-family:'Barlow Condensed',sans-serif; font-size:12px; letter-spacing:0.12em; text-transform:uppercase; opacity:0.7; }
+  .chips{ display:flex; flex-wrap:wrap; gap:6px; padding:10px 14px 0; }
+  .chip{ font-family:'Barlow Condensed',sans-serif; font-size:13px; letter-spacing:0.04em; padding:3px 10px; border-radius:999px; border:1.5px solid var(--line); color:var(--muted); }
+  .chip.weather{ border-color:var(--teal); color:var(--teal); }
+  .race-body{ padding:12px 14px 14px; flex:1; }
+  .result{ list-style:none; margin:0; padding:0; }
+  .result li{ display:flex; align-items:center; gap:10px; padding:6px 0; border-bottom:1px dashed var(--line); }
+  .result li:last-child{ border-bottom:none; }
+  .result .pos{ font-family:'Racing Sans One',sans-serif; width:26px; font-size:18px; }
+  .result .who{ flex:1; display:flex; align-items:center; gap:8px; font-weight:500; }
+  .result .pts{ font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:16px; }
+  .result li.first .pos{ color:var(--gold); }
 
-  .modal-overlay{ position:fixed; inset:0; background:rgba(5,4,15,0.75); backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; z-index:50; }
-  .modal-box{ background:var(--bg-2); border:1px solid var(--card-border); border-radius:16px; padding:24px; max-width:320px; width:90%; text-align:center; }
-  .modal-box h3{ margin:0 0 14px; font-size:14px; color:var(--text); font-family:'JetBrains Mono',monospace; letter-spacing:0.05em;}
+  .field{ display:flex; flex-direction:column; gap:4px; margin-bottom:10px; }
+  .field label, .block-lbl{ font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:12px; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); }
+  .field-row{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  input[type=text], select{
+    width:100%; font-family:'Barlow',sans-serif; font-size:14px; color:var(--ink);
+    background:var(--paper); border:1.5px solid var(--line); border-radius:8px; padding:7px 9px;
+  }
+  input[type=text]:focus, select:focus{ outline:2px solid var(--teal); outline-offset:1px; }
+  .block{ margin-top:6px; padding-top:12px; border-top:1px dashed var(--line); }
+  .toggles{ display:flex; flex-wrap:wrap; gap:6px; margin:8px 0 4px; }
+  .tog{ font-family:'Barlow Condensed',sans-serif; font-weight:600; font-size:14px; letter-spacing:0.03em; padding:5px 11px; border-radius:999px;
+    border:1.5px solid var(--line); background:transparent; color:var(--muted); cursor:pointer; }
+  .tog.on{ color:#1d1a16; border-color:var(--ink); }
+  .pos-row{ display:flex; align-items:center; gap:10px; margin-top:8px; }
+  .pos-row .who{ flex:1; display:flex; align-items:center; gap:8px; font-weight:500; min-width:0; }
+  .pos-row select{ width:150px; }
+  .warn{ margin-top:10px; font-size:13px; color:var(--red); font-weight:600; }
+  .del-link{ display:block; width:100%; margin-top:14px; padding-top:10px; border:none; border-top:1px dashed var(--line); background:none;
+    font-family:'Barlow Condensed',sans-serif; font-size:13px; letter-spacing:0.06em; color:var(--muted); cursor:pointer; text-align:center; }
+  .del-link:hover{ color:var(--red); }
+  .add-race{ border:2px dashed var(--muted); border-radius:var(--radius); background:transparent; color:var(--muted); cursor:pointer; min-height:160px;
+    font-family:'Racing Sans One',sans-serif; font-size:22px; }
+  .add-race:hover{ border-color:var(--red); color:var(--red); }
+
+  /* ---------- PLAYERS (edit) ---------- */
+  .players{ display:grid; grid-template-columns:repeat(auto-fill, minmax(180px,1fr)); gap:10px; }
+  .player{ display:flex; align-items:center; gap:8px; background:var(--card); border:2px solid var(--ink); border-radius:10px; padding:6px 8px; }
+  .player .swatch-btn{ width:22px; height:22px; border-radius:50%; border:2px solid var(--ink); cursor:pointer; flex-shrink:0; padding:0; }
+  .player input{ border:none; background:transparent; padding:4px 2px; min-width:0; }
+  .x-btn{ border:none; background:none; color:var(--muted); cursor:pointer; font-size:15px; padding:2px 4px; }
+  .x-btn:hover{ color:var(--red); }
+  .season-name{ display:flex; align-items:center; gap:10px; margin-top:12px; max-width:420px; }
+
+  /* ---------- MODAL ---------- */
+  .overlay{ position:fixed; inset:0; background:rgba(15,12,9,0.6); display:flex; align-items:center; justify-content:center; z-index:50; padding:16px; }
+  .modal{ background:var(--card); border:2px solid var(--ink); border-radius:16px; padding:20px; width:100%; max-width:340px; text-align:center; }
+  .modal h3{ font-family:'Racing Sans One',sans-serif; font-weight:400; margin:0 0 14px; font-size:22px; }
   .swatches{ display:grid; grid-template-columns:repeat(6,1fr); gap:10px; }
-  .swatch{ width:100%; aspect-ratio:1; border-radius:50%; cursor:pointer; border:2px solid transparent; transition:transform .15s; }
-  .swatch:hover{ transform:scale(1.15); border-color:#fff; }
-  .icon-grid{ display:grid; grid-template-columns:repeat(5,1fr); gap:8px; max-height:280px; overflow-y:auto; padding-right:4px; }
-  .icon-swatch{ background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-radius:10px; padding:8px;
-    cursor:pointer; transition: border-color .15s, transform .15s; }
-  .icon-swatch svg{ width:100%; height:100%; display:block; }
-  .icon-swatch:hover{ border-color:var(--cyan); transform:scale(1.08); }
-  .modal-cancel{ margin-top:16px; background:none; border:1px solid var(--card-border); color:var(--muted); padding:7px 14px; border-radius:8px; cursor:pointer; font-family:'JetBrains Mono',monospace; font-size:11px;}
+  .swatch{ aspect-ratio:1; border-radius:50%; border:2px solid var(--ink); cursor:pointer; padding:0; }
+  .swatch.taken{ opacity:0.3; }
+  .modal .cancel{ margin-top:16px; }
 
-  @media (prefers-reduced-motion: reduce){ .grid-floor{ animation:none; } }
+  footer{ margin-top:50px; text-align:center; color:var(--muted); font-family:'Barlow Condensed',sans-serif; font-size:13px; letter-spacing:0.06em; }
+
+  @media (max-width:640px){
+    .hero{ grid-template-columns:1fr; }
+    .hero-car{ width:100%; max-width:320px; justify-self:center; }
+    .field-row{ grid-template-columns:1fr; }
+    .pod .place{ font-size:24px; }
+  }
 </style>
 </head>
 <body>
 
-  <div class="hero">
-    <div class="hero-glow"></div>
-    <div class="grid-floor"></div>
-    <div class="hero-content">
-      <div class="eyebrow">Weekend LAN · Multi-jeux</div>
-      <h1 class="display">CHAMPIONNAT&nbsp;LAN</h1>
-      <p>Classement général en direct — mis à jour au fil des manches</p>
+  <header class="hero">
+    <div>
+      <div class="eyebrow">Classement officiel du garage</div>
+      <h1 class="title"><small>Championnat</small>HEAT</h1>
+      <p class="tagline">Saisons, courses et classement des pilotes — mis à jour en direct depuis la table de jeu.</p>
     </div>
-  </div>
-  <div class="lockbar"><button class="lock-btn" id="lockBtn"></button><span id="syncStatus" class="sync-status mono"></span></div>
+    <svg class="hero-car" viewBox="0 0 360 150" role="img" aria-label="Voiture de course des années 60">
+      <g stroke="var(--ink)" stroke-width="3" stroke-linecap="round">
+        <line x1="6" y1="70" x2="40" y2="70" opacity="0.5"/>
+        <line x1="0" y1="86" x2="28" y2="86" opacity="0.35"/>
+        <line x1="12" y1="102" x2="34" y2="102" opacity="0.5"/>
+      </g>
+      <ellipse cx="190" cy="132" rx="160" ry="8" fill="var(--ink)" opacity="0.12"/>
+      <path d="M44 74 L22 70 M44 80 L18 78" stroke="var(--ink)" stroke-width="5" stroke-linecap="round"/>
+      <path d="M44 92 C44 76 80 68 128 68 L262 66 C306 66 338 76 350 88 C344 98 306 104 262 104 L80 106 C58 106 44 102 44 92 Z"
+            fill="var(--red)" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M128 68 L262 66" stroke="var(--paper)" stroke-width="4" opacity="0.55"/>
+      <path d="M160 68 Q178 46 202 66" fill="none" stroke="var(--ink)" stroke-width="3"/>
+      <circle cx="182" cy="56" r="13" fill="var(--teal)" stroke="var(--ink)" stroke-width="3"/>
+      <path d="M184 51 h10 v7 h-10 z" fill="var(--paper)" stroke="var(--ink)" stroke-width="2"/>
+      <circle cx="238" cy="86" r="14" fill="var(--paper)" stroke="var(--ink)" stroke-width="3"/>
+      <text x="238" y="92" text-anchor="middle" font-family="Racing Sans One, sans-serif" font-size="17" fill="var(--ink)">7</text>
+      <circle cx="96" cy="106" r="27" fill="var(--ink)"/>
+      <circle cx="96" cy="106" r="11" fill="var(--mustard)" stroke="var(--ink)" stroke-width="3"/>
+      <circle cx="298" cy="106" r="23" fill="var(--ink)"/>
+      <circle cx="298" cy="106" r="9" fill="var(--mustard)" stroke="var(--ink)" stroke-width="3"/>
+    </svg>
+  </header>
+  <div class="checker" aria-hidden="true"></div>
 
-  <div class="wrap">
-    <div class="section">
-      <div class="section-head"><span class="tag">TOP 3</span><h2>Podium</h2></div>
-      <div class="podium" id="podium"></div>
-    </div>
-
-    <div class="section">
-      <div class="section-head"><span class="tag">GÉNÉRAL</span><h2>Classement complet</h2></div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr id="tableHead"></tr></thead>
-          <tbody id="tableBody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="section" id="playersSection">
-      <div class="section-head"><span class="tag">ROSTER</span><h2>Joueurs</h2></div>
-      <div class="hint" style="margin:-12px 0 18px;">Ajoutez ou retirez des joueurs du championnat ici.</div>
-      <div class="players-grid" id="playersGrid"></div>
-    </div>
-
-    <div class="section">
-      <div class="section-head"><span class="tag">ÉPREUVES</span><h2>Jeux du weekend</h2></div>
-      <div class="hint">Chaque jeu peut avoir plusieurs manches — les points s'additionnent sur toutes les manches jouées.</div>
-      <div class="games-grid" id="gamesGrid"></div>
+  <main class="wrap">
+    <div class="toolbar">
+      <button class="lock-btn" id="lockBtn"></button>
+      <span class="sync" id="sync"></span>
     </div>
 
-    <footer>BARÈME DYNAMIQUE · LE 1ER GAGNE ~10 PTS × (NB JOUEURS ÷ 8) · RÉGLABLE PAR MANCHE</footer>
-  </div>
+    <nav class="seasons" id="seasons"></nav>
+    <div id="seasonEdit"></div>
+
+    <section class="section">
+      <div class="section-head"><h2>Podium</h2><span class="sub" id="podiumSub"></span></div>
+      <div id="podium"></div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Classement</h2><span class="sub">Points cumulés sur la saison</span></div>
+      <div id="standings"></div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Courses</h2><span class="sub" id="racesSub"></span></div>
+      <div class="races" id="races"></div>
+      <div id="seasonDelete"></div>
+    </section>
+
+    <section class="section" id="playersSection" hidden>
+      <div class="section-head"><h2>Pilotes</h2><span class="sub">Ajouter, renommer ou retirer des pilotes du championnat</span></div>
+      <div class="players" id="players"></div>
+    </section>
+
+    <footer>Barème dynamique : le vainqueur marque environ 10 pts × (pilotes au départ ÷ 6), les places suivantes au prorata.</footer>
+  </main>
+
+  <datalist id="circuitList"></datalist>
+  <datalist id="weatherList"></datalist>
 
 <script>
-  const STORAGE_KEY = 'championnat-lan-state-v2';
-  const EDIT_CODE = '12091980';
-  const PALETTE = ['#f55050','#ec501c','#f5a350','#ecb81c','#f5f550','#b8ec1c','#a3f550','#50ec1c','#50f550','#1cec50','#50f5a3','#1cecb8','#50f5f5','#1cb8ec','#50a3f5','#1c50ec','#5050f5','#501cec','#a350f5','#b81cec','#f550f5','#ec1cb8','#f550a3','#ec1c50'];
-
-  const ICONS = {
-    skull: '<svg viewBox="0 0 48 48" fill="none"><defs><linearGradient id="gSkull" x1="0" y1="0" x2="48" y2="48"><stop offset="0" stop-color="#00e5ff"/><stop offset="1" stop-color="#ff2e92"/></linearGradient></defs><path d="M24 5c-9.4 0-16 6.7-16 15.2 0 5.6 2.8 9 5.4 11.4v6.8c0 1 .8 1.8 1.8 1.8h3.2v-4h3v4h5v-4h3v4h3.2c1 0 1.8-.8 1.8-1.8v-6.8c2.6-2.4 5.4-5.8 5.4-11.4C40 11.7 33.4 5 24 5z" stroke="url(#gSkull)" stroke-width="2" stroke-linejoin="round"/><circle cx="17" cy="21" r="3" stroke="url(#gSkull)" stroke-width="2"/><circle cx="31" cy="21" r="3" stroke="url(#gSkull)" stroke-width="2"/><path d="M22 27h4l-2 4-2-4z" stroke="url(#gSkull)" stroke-width="1.6" stroke-linejoin="round"/></svg>',
-    car: '<svg viewBox="0 0 48 48" fill="none"><defs><linearGradient id="gCar" x1="0" y1="0" x2="48" y2="48"><stop offset="0" stop-color="#00e5ff"/><stop offset="1" stop-color="#ff2e92"/></linearGradient></defs><path d="M6 30l3-9c1-3 4-5 7-5h16c3 0 6 2 7 5l3 9" stroke="url(#gCar)" stroke-width="2" stroke-linejoin="round"/><path d="M6 30h36v4a2 2 0 01-2 2h-3a3 3 0 01-6 0H19a3 3 0 01-6 0H8a2 2 0 01-2-2v-4z" stroke="url(#gCar)" stroke-width="2" stroke-linejoin="round"/><path d="M14 16l-2 6M34 16l2 6" stroke="url(#gCar)" stroke-width="2"/><circle cx="14" cy="34" r="1.6" fill="url(#gCar)"/><circle cx="34" cy="34" r="1.6" fill="url(#gCar)"/><path d="M40 22l4-2" stroke="url(#gCar)" stroke-width="2" stroke-linecap="round"/></svg>',
-    hex: '<svg viewBox="0 0 48 48" fill="none"><defs><linearGradient id="gHex" x1="0" y1="0" x2="48" y2="48"><stop offset="0" stop-color="#00e5ff"/><stop offset="1" stop-color="#ff2e92"/></linearGradient></defs><path d="M24 4l17 10v20L24 44 7 34V14L24 4z" stroke="url(#gHex)" stroke-width="2" stroke-linejoin="round"/><path d="M24 15l8 5v9l-8 5-8-5v-9l8-5z" stroke="url(#gHex)" stroke-width="1.6" stroke-linejoin="round"/><circle cx="24" cy="24" r="2" fill="url(#gHex)"/></svg>',
-    controller: '<svg viewBox="0 0 48 48" fill="none"><defs><linearGradient id="gCtrl" x1="0" y1="0" x2="48" y2="48"><stop offset="0" stop-color="#00e5ff"/><stop offset="1" stop-color="#ff2e92"/></linearGradient></defs><path d="M13 18h6M16 15v6" stroke="url(#gCtrl)" stroke-width="2" stroke-linecap="round"/><circle cx="33" cy="16" r="1.8" fill="url(#gCtrl)"/><circle cx="29" cy="20" r="1.8" fill="url(#gCtrl)"/><path d="M11 18c-4 0-6 4-6 9 0 5 2 9 5 9 2.5 0 3.5-3 6-3h16c2.5 0 3.5 3 6 3 3 0 5-4 5-9 0-5-2-9-6-9H11z" stroke="url(#gCtrl)" stroke-width="2" stroke-linejoin="round"/></svg>',
-    sword: '<svg viewBox="0 0 48 48" fill="none"><defs><linearGradient id="gSword" x1="0" y1="0" x2="48" y2="48"><stop offset="0" stop-color="#00e5ff"/><stop offset="1" stop-color="#ff2e92"/></linearGradient></defs><path d="M30 8l10 10-4 4-10-10z" stroke="url(#gSword)" stroke-width="2" stroke-linejoin="round"/><path d="M32 18L14 36" stroke="url(#gSword)" stroke-width="2" stroke-linecap="round"/><path d="M10 34l4 4M8 40l4-4" stroke="url(#gSword)" stroke-width="2" stroke-linecap="round"/><path d="M18 30l4 4" stroke="url(#gSword)" stroke-width="2" stroke-linecap="round"/></svg>',
-    trophy: '<svg viewBox="0 0 48 48" fill="none"><defs><linearGradient id="gTrophy" x1="0" y1="0" x2="48" y2="48"><stop offset="0" stop-color="#00e5ff"/><stop offset="1" stop-color="#ff2e92"/></linearGradient></defs><path d="M16 8h16v10a8 8 0 01-16 0V8z" stroke="url(#gTrophy)" stroke-width="2" stroke-linejoin="round"/><path d="M16 10h-6a2 2 0 000 4c0 4 3 6 6 6M32 10h6a2 2 0 010 4c0 4-3 6-6 6" stroke="url(#gTrophy)" stroke-width="2" stroke-linejoin="round"/><path d="M24 26v6" stroke="url(#gTrophy)" stroke-width="2"/><path d="M20 36h8v4h-8z" stroke="url(#gTrophy)" stroke-width="2" stroke-linejoin="round"/><path d="M18 40h12" stroke="url(#gTrophy)" stroke-width="2" stroke-linecap="round"/></svg>',
-    dice: '<svg viewBox="0 0 48 48" fill="none"><defs><linearGradient id="gDice" x1="0" y1="0" x2="48" y2="48"><stop offset="0" stop-color="#00e5ff"/><stop offset="1" stop-color="#ff2e92"/></linearGradient></defs><rect x="10" y="10" width="28" height="28" rx="6" stroke="url(#gDice)" stroke-width="2"/><circle cx="18" cy="18" r="2" fill="url(#gDice)"/><circle cx="30" cy="18" r="2" fill="url(#gDice)"/><circle cx="24" cy="24" r="2" fill="url(#gDice)"/><circle cx="18" cy="30" r="2" fill="url(#gDice)"/><circle cx="30" cy="30" r="2" fill="url(#gDice)"/></svg>',
-    joystick: '<svg viewBox="0 0 48 48" fill="none"><defs><linearGradient id="gJoy" x1="0" y1="0" x2="48" y2="48"><stop offset="0" stop-color="#00e5ff"/><stop offset="1" stop-color="#ff2e92"/></linearGradient></defs><circle cx="24" cy="14" r="6" stroke="url(#gJoy)" stroke-width="2"/><path d="M24 20v14" stroke="url(#gJoy)" stroke-width="2"/><path d="M12 40h24" stroke="url(#gJoy)" stroke-width="2" stroke-linecap="round"/><path d="M18 34l-6 6M30 34l6 6" stroke="url(#gJoy)" stroke-width="2" stroke-linecap="round"/></svg>',
-    target: '<svg viewBox="0 0 48 48" fill="none"><defs><linearGradient id="gTarget" x1="0" y1="0" x2="48" y2="48"><stop offset="0" stop-color="#00e5ff"/><stop offset="1" stop-color="#ff2e92"/></linearGradient></defs><circle cx="24" cy="24" r="14" stroke="url(#gTarget)" stroke-width="2"/><circle cx="24" cy="24" r="8" stroke="url(#gTarget)" stroke-width="2"/><circle cx="24" cy="24" r="2" fill="url(#gTarget)"/><path d="M24 4v6M24 38v6M4 24h6M38 24h6" stroke="url(#gTarget)" stroke-width="2" stroke-linecap="round"/></svg>',
-    rocket: '<svg viewBox="0 0 48 48" fill="none"><defs><linearGradient id="gRocket" x1="0" y1="0" x2="48" y2="48"><stop offset="0" stop-color="#00e5ff"/><stop offset="1" stop-color="#ff2e92"/></linearGradient></defs><path d="M24 4c6 4 8 12 8 18 0 4-2 8-8 8s-8-4-8-8c0-6 2-14 8-18z" stroke="url(#gRocket)" stroke-width="2" stroke-linejoin="round"/><circle cx="24" cy="18" r="3" stroke="url(#gRocket)" stroke-width="2"/><path d="M16 26l-6 8 8-2M32 26l6 8-8-2" stroke="url(#gRocket)" stroke-width="2" stroke-linejoin="round"/><path d="M20 34l-2 8 6-4 6 4-2-8" stroke="url(#gRocket)" stroke-width="2" stroke-linejoin="round"/></svg>',
-    puzzle: '<svg viewBox="0 0 48 48" fill="none"><defs><linearGradient id="gPuzzle" x1="0" y1="0" x2="48" y2="48"><stop offset="0" stop-color="#00e5ff"/><stop offset="1" stop-color="#ff2e92"/></linearGradient></defs><path d="M10 10h12v6a3 3 0 106 0v-6h10v12h-6a3 3 0 100 6h6v10H28v-6a3 3 0 10-6 0v6H10V28h6a3 3 0 100-6h-6z" stroke="url(#gPuzzle)" stroke-width="2" stroke-linejoin="round"/></svg>',
-    cards: '<svg viewBox="0 0 48 48" fill="none"><defs><linearGradient id="gCards" x1="0" y1="0" x2="48" y2="48"><stop offset="0" stop-color="#00e5ff"/><stop offset="1" stop-color="#ff2e92"/></linearGradient></defs><rect x="6" y="16" width="20" height="28" rx="3" transform="rotate(-10 6 16)" stroke="url(#gCards)" stroke-width="2"/><rect x="18" y="8" width="20" height="28" rx="3" stroke="url(#gCards)" stroke-width="2"/></svg>',
-    shield: '<svg viewBox="0 0 48 48" fill="none"><defs><linearGradient id="gShield" x1="0" y1="0" x2="48" y2="48"><stop offset="0" stop-color="#00e5ff"/><stop offset="1" stop-color="#ff2e92"/></linearGradient></defs><path d="M24 6l14 6v10c0 10-6 16-14 20-8-4-14-10-14-20V12z" stroke="url(#gShield)" stroke-width="2" stroke-linejoin="round"/><path d="M18 24l4 4 8-8" stroke="url(#gShield)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-    ball: '<svg viewBox="0 0 48 48" fill="none"><defs><linearGradient id="gBall" x1="0" y1="0" x2="48" y2="48"><stop offset="0" stop-color="#00e5ff"/><stop offset="1" stop-color="#ff2e92"/></linearGradient></defs><circle cx="24" cy="24" r="16" stroke="url(#gBall)" stroke-width="2"/><path d="M24 8v32M8 24h32M13 13c6 6 16 6 22 0M13 35c6-6 16-6 22 0" stroke="url(#gBall)" stroke-width="1.6"/></svg>',
-    crown: '<svg viewBox="0 0 48 48" fill="none"><defs><linearGradient id="gCrown" x1="0" y1="0" x2="48" y2="48"><stop offset="0" stop-color="#00e5ff"/><stop offset="1" stop-color="#ff2e92"/></linearGradient></defs><path d="M8 34l-2-16 8 6 10-12 10 12 8-6-2 16z" stroke="url(#gCrown)" stroke-width="2" stroke-linejoin="round"/><path d="M8 34h32v4H8z" stroke="url(#gCrown)" stroke-width="2" stroke-linejoin="round"/></svg>',
-    ghost: '<svg viewBox="0 0 48 48" fill="none"><defs><linearGradient id="gGhost" x1="0" y1="0" x2="48" y2="48"><stop offset="0" stop-color="#00e5ff"/><stop offset="1" stop-color="#ff2e92"/></linearGradient></defs><path d="M14 40V20a10 10 0 0120 0v20l-4-4-3 4-3-4-3 4-3-4-4 4z" stroke="url(#gGhost)" stroke-width="2" stroke-linejoin="round"/><circle cx="19" cy="20" r="1.6" fill="url(#gGhost)"/><circle cx="29" cy="20" r="1.6" fill="url(#gGhost)"/></svg>',
-    map: '<svg viewBox="0 0 48 48" fill="none"><defs><linearGradient id="gMap" x1="0" y1="0" x2="48" y2="48"><stop offset="0" stop-color="#00e5ff"/><stop offset="1" stop-color="#ff2e92"/></linearGradient></defs><path d="M8 12l12-4 8 4 12-4v28l-12 4-8-4-12 4z" stroke="url(#gMap)" stroke-width="2" stroke-linejoin="round"/><path d="M20 8v28M28 12v28" stroke="url(#gMap)" stroke-width="2"/></svg>'
-  };
-
-  let unlocked = false;
-
-  function genId(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
-
-  let state = {
-    players: [
-      {id:'p1',name:'Joueur 1',color:PALETTE[0]}, {id:'p2',name:'Joueur 2',color:PALETTE[1]},
-      {id:'p3',name:'Joueur 3',color:PALETTE[2]}, {id:'p4',name:'Joueur 4',color:PALETTE[3]},
-      {id:'p5',name:'Joueur 5',color:PALETTE[4]}, {id:'p6',name:'Joueur 6',color:PALETTE[5]},
-      {id:'p7',name:'Joueur 7',color:PALETTE[6]}, {id:'p8',name:'Joueur 8',color:PALETTE[7]}
-    ],
-    games: [
-      {id:'l4d',  name:'Left 4 Dead',         desc:'Versus 4v4 — Survivants vs Infectés', icon:'skull', type:'rank'},
-      {id:'rally',name:'Assetto Corsa Rally', desc:'Chrono individuel — plusieurs circuits', icon:'car', type:'time'},
-      {id:'sc2',  name:'StarCraft II',        desc:'Team Melee 4v4 — partie personnalisée', icon:'hex', type:'rank'}
-    ],
-    rounds: { l4d:[], rally:[], sc2:[] }
-  };
-
-  const JSONBIN_ID = '6a779517f5f4af5e29fc7ccc';
+  const JSONBIN_ID  = '6a779517f5f4af5e29fc7ccc';
   const JSONBIN_KEY = '$2a$10$FI7IjxX3KTowFAu9m8FgfO0av6r8V4L5Y7eesq62louGU80IQJjNC';
   const JSONBIN_URL = 'https://api.jsonbin.io/v3/b/' + JSONBIN_ID;
+  const EDIT_CODE   = '12091980';
+  const PALETTE = ['#f55050','#ec501c','#f5a350','#ecb81c','#f5f550','#b8ec1c','#a3f550','#50ec1c','#50f550','#1cec50','#50f5a3','#1cecb8',
+                   '#50f5f5','#1cb8ec','#50a3f5','#1c50ec','#5050f5','#501cec','#a350f5','#b81cec','#f550f5','#ec1cb8','#f550a3','#ec1c50'];
+  const CIRCUITS = ['USA','Grande-Bretagne','France','Italie'];
+  const WEATHER  = ['Ensoleillé','Nuageux','Pluie','Forte pluie','Brouillard','Grand froid','Canicule'];
 
-  function showSync(status){
-    const el = document.getElementById('syncStatus');
-    if(!el) return;
-    if(status === 'saving'){ el.textContent = '● Sauvegarde…'; el.style.color = 'var(--gold)'; }
-    else if(status === 'saved'){ el.textContent = '● Synchronisé'; el.style.color = 'var(--cyan)'; }
-    else { el.textContent = '● Hors ligne — réessai auto'; el.style.color = 'var(--magenta)'; }
+  document.getElementById('circuitList').innerHTML = CIRCUITS.map(c=>`<option value="${c}">`).join('');
+  document.getElementById('weatherList').innerHTML = WEATHER.map(c=>`<option value="${c}">`).join('');
+
+  let unlocked = false;
+  let viewSeasonId = null;
+  let state = freshState();
+
+  function genId(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+  function freshState(){ return { app:'heat', version:1, players:[], seasons:[{ id:genId(), name:'Saison 1', races:[] }] }; }
+  function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function player(id){ return state.players.find(p=>p.id===id); }
+  function season(){ return state.seasons.find(s=>s.id===viewSeasonId) || state.seasons[state.seasons.length-1]; }
+
+  function normalize(d){
+    if(!d || d.app !== 'heat' || !Array.isArray(d.seasons)) return null;
+    d.players = Array.isArray(d.players) ? d.players : [];
+    if(!d.seasons.length) d.seasons.push({ id:genId(), name:'Saison 1', races:[] });
+    d.seasons.forEach(s=>{
+      s.races = Array.isArray(s.races) ? s.races : [];
+      s.races.forEach(r=>{ r.participants = r.participants || []; r.positions = r.positions || {}; });
+    });
+    return d;
   }
 
+  /* ---------- STORAGE ---------- */
+  function showSync(status){
+    const el = document.getElementById('sync');
+    el.textContent = status === 'saving' ? '● Sauvegarde…' : status === 'saved' ? '● Synchronisé' : '● Hors ligne — nouvel essai automatique';
+    el.style.color = status === 'saving' ? 'var(--mustard)' : status === 'saved' ? 'var(--teal)' : 'var(--red)';
+  }
+  function pickSeason(){
+    if(!viewSeasonId){ try{ viewSeasonId = localStorage.getItem('heat-season'); }catch(e){} }
+    if(!state.seasons.some(s=>s.id===viewSeasonId)) viewSeasonId = state.seasons[state.seasons.length-1].id;
+  }
   async function loadState(){
     try{
-      const res = await fetch(JSONBIN_URL + '/latest', { headers: { 'X-Access-Key': JSONBIN_KEY } });
+      const res = await fetch(JSONBIN_URL + '/latest', { headers:{ 'X-Access-Key':JSONBIN_KEY }, cache:'no-store' });
       if(res.ok){
         const data = await res.json();
-        if(data && data.record){ state = data.record; }
-      }
-      showSync('saved');
-    }catch(e){ console.error('Erreur de chargement', e); showSync('error'); }
-    state.games.forEach(g=>{ if(!state.rounds[g.id]) state.rounds[g.id] = []; });
-    renderAll();
+        const n = normalize(data.record);
+        if(n) state = n;
+        showSync('saved');
+      } else showSync('error');
+    }catch(e){ showSync('error'); }
+    pickSeason(); renderAll();
   }
   async function saveState(){
     showSync('saving');
     try{
-      const res = await fetch(JSONBIN_URL, {
-        method: 'PUT',
-        headers: { 'Content-Type':'application/json', 'X-Access-Key': JSONBIN_KEY },
-        body: JSON.stringify(state)
-      });
+      const res = await fetch(JSONBIN_URL, { method:'PUT', headers:{ 'Content-Type':'application/json', 'X-Access-Key':JSONBIN_KEY }, body:JSON.stringify(state) });
       showSync(res.ok ? 'saved' : 'error');
-    }catch(e){ console.error('Erreur de sauvegarde', e); showSync('error'); }
+    }catch(e){ showSync('error'); }
   }
+  function commit(){ saveState(); renderAll(); }
 
-  function parseTime(str){
-    if(!str) return null;
-    str = str.trim();
-    let m = str.match(/^(\d{1,2}):(\d{1,2}):(\d{1,3})$/);
-    if(m){ return parseInt(m[1],10)*60 + parseInt(m[2],10) + parseInt(m[3].padEnd(3,'0'),10)/1000; }
-    m = str.match(/^(\d+):(\d{1,2}(?:\.\d+)?)$/);
-    if(m){ return parseInt(m[1],10)*60 + parseFloat(m[2]); }
-    m = str.match(/^\d+(\.\d+)?$/);
-    if(m){ return parseFloat(str); }
-    return null;
-  }
-
-  function computeRoundPoints(game, round){
-    const pts = {};
-    if(game.type === 'rank'){
-      // round.results est maintenant recalculé en continu par recomputeRound() -> lecture directe
-      state.players.forEach(p=>{ pts[p.id] = round.results[p.id] || 0; });
-    } else {
-      const entries = state.players
-        .map(p=>({id:p.id, sec: parseTime(round.results[p.id])}))
-        .filter(e=>e.sec !== null)
-        .sort((a,b)=>a.sec-b.sec);
-      state.players.forEach(p=>pts[p.id]=0);
-      entries.forEach((e,i)=>{ pts[e.id] = pointsForRank(i+1, entries.length || 8); });
-    }
-    return pts;
-  }
-
-  // Barème dynamique : le 1er de la manche gagne round(10 × nb_joueurs / 8) points,
-  // les places suivantes se répartissent proportionnellement.
-  // 8 joueurs -> 10 pts pour le 1er (comme avant) · 12 joueurs -> 15 pts · 4 joueurs -> 5 pts
-  function firstPlacePoints(P){ return Math.max(1, Math.round(10 * (P||8) / 8)); }
+  /* ---------- POINTS ---------- */
+  // Le vainqueur marque round(10 × P / 6) ; les places suivantes au prorata. 6 pilotes -> 10/8/7/5/3/2
+  function firstPlacePoints(P){ return Math.max(1, Math.round(10 * P / 6)); }
   function pointsForRank(rank, P){
-    if(!rank || !P) return 0;
-    return Math.max(0, Math.round(firstPlacePoints(P) * (P - rank + 1) / P));
+    if(!rank || !P || rank > P) return 0;
+    return Math.max(1, Math.round(firstPlacePoints(P) * (P - rank + 1) / P));
   }
-  // Barème équipe : basé sur la position parmi les équipes, mis à l'échelle du nombre de joueurs de la manche
-  function teamPointsForRank(rank, totalTeams, P){
-    if(!rank || !totalTeams) return 0;
-    return Math.max(0, Math.round(firstPlacePoints(P) * (totalTeams - rank + 1) / totalTeams));
+  function raceResults(race){
+    const P = race.participants.length;
+    return race.participants
+      .filter(pid => race.positions[pid] && player(pid))
+      .map(pid => ({ pid, rank:race.positions[pid], pts:pointsForRank(race.positions[pid], P) }))
+      .sort((a,b)=>a.rank-b.rank);
   }
-
-  // Bonus/malus lié à la taille de l'équipe par rapport à la moyenne de la manche (écart max 1 joueur -> ±1 pt)
-  function sizeAdjustment(team, allTeams){
-    const sizes = allTeams.filter(t=>t.members.length>0).map(t=>t.members.length);
-    if(sizes.length < 2) return 0;
-    const avg = sizes.reduce((a,b)=>a+b,0)/sizes.length;
-    const diff = team.members.length - avg;
-    if(diff > 0.01) return -1;
-    if(diff < -0.01) return 1;
-    return 0;
-  }
-
-  // Recalcule entièrement les points d'une manche (positions individuelles OU équipes, selon le mode actif)
-  function recomputeRound(round){
-    round.positions = round.positions || {};
-    round.participants = round.participants || state.players.map(p=>p.id);
-    round.teams = round.teams || [];
-    round.teamMode = !!round.teamMode;
-    round.results = {};
-    const P = round.participants.length;
-    if(!round.teamMode){
-      Object.entries(round.positions).forEach(([pid, rank])=>{
-        if(rank && round.participants.includes(pid)){ round.results[pid] = pointsForRank(rank, P); }
-      });
-    } else {
-      const N = round.teams.length;
-      round.teams.forEach(t=>{ if(t.position && t.position > N) t.position = null; });
-      round.teams.forEach(t=>{
-        if(t.position){
-          const pts = Math.max(0, teamPointsForRank(t.position, N, P) + sizeAdjustment(t, round.teams));
-          t.members.forEach(pid=>{ round.results[pid] = pts; });
-        }
-      });
-    }
-  }
-
-  function computeGameTotal(game){
-    const totals = {}; state.players.forEach(p=>totals[p.id]=0);
-    (state.rounds[game.id]||[]).forEach(round=>{
-      const pts = computeRoundPoints(game, round);
-      state.players.forEach(p=>{ totals[p.id]+=pts[p.id]||0; });
-    });
-    return totals;
-  }
-
-  // Nombre de manches où le joueur a effectivement un résultat enregistré (toutes épreuves confondues)
-  function countRoundsPlayed(pid){
-    let count = 0;
-    state.games.forEach(g=>{
-      (state.rounds[g.id]||[]).forEach(round=>{
-        const v = round.results && round.results[pid];
-        if(v !== undefined && v !== null && v !== ''){ count++; }
+  function standings(s){
+    const rows = {};
+    s.races.forEach(race=>{
+      raceResults(race).forEach(r=>{
+        const row = rows[r.pid] || (rows[r.pid] = { pid:r.pid, total:0, races:0, wins:0, podiums:0, per:{} });
+        row.total += r.pts; row.races++; row.per[race.id] = r;
+        if(r.rank === 1) row.wins++;
+        if(r.rank <= 3) row.podiums++;
       });
     });
-    return count;
-  }
-
-  function computeGrandTotals(){
-    const totals = {}; state.players.forEach(p=>totals[p.id]=0);
-    state.games.forEach(g=>{
-      const gt = computeGameTotal(g);
-      state.players.forEach(p=>{ totals[p.id]+=gt[p.id]||0; });
+    const list = Object.values(rows).sort((a,b)=> b.total-a.total || b.wins-a.wins || b.podiums-a.podiums || player(a.pid).name.localeCompare(player(b.pid).name));
+    let rank = 0;
+    list.forEach((row,i)=>{
+      const prev = list[i-1];
+      rank = (prev && prev.total===row.total && prev.wins===row.wins && prev.podiums===row.podiums) ? rank : i+1;
+      row.rank = rank;
     });
-    return state.players.map(p=>({...p, total:totals[p.id], played:countRoundsPlayed(p.id)})).sort((a,b)=>b.total-a.total);
+    return list;
   }
 
-  // ---------- MODAL COLOR PICKER ----------
-  function openColorPicker(title, onPick){
-    const overlay = document.createElement('div');
-    overlay.className = 'modal-overlay';
-    overlay.innerHTML = `<div class="modal-box"><h3>${title}</h3><div class="swatches">${PALETTE.map(c=>`<div class="swatch" style="background:${c}" data-c="${c}"></div>`).join('')}</div><button class="modal-cancel">Annuler</button></div>`;
-    document.body.appendChild(overlay);
-    overlay.querySelectorAll('.swatch').forEach(sw=>{
-      sw.addEventListener('click', ()=>{ onPick(sw.dataset.c); overlay.remove(); });
-    });
-    overlay.querySelector('.modal-cancel').addEventListener('click', ()=>overlay.remove());
-    overlay.addEventListener('click', e=>{ if(e.target===overlay) overlay.remove(); });
+  /* ---------- MODAL ---------- */
+  function openColorPicker(title, current, onPick){
+    const used = new Set(state.players.map(p=>p.color));
+    const ov = document.createElement('div');
+    ov.className = 'overlay';
+    ov.innerHTML = `<div class="modal"><h3>${esc(title)}</h3>
+      <div class="swatches">${PALETTE.map(c=>`<button class="swatch ${used.has(c)&&c!==current?'taken':''}" style="background:${c}" data-c="${c}" title="${used.has(c)&&c!==current?'Déjà prise':''}"></button>`).join('')}</div>
+      <button class="ghost-btn cancel">Annuler</button></div>`;
+    document.body.appendChild(ov);
+    ov.querySelectorAll('.swatch').forEach(b=>b.addEventListener('click', ()=>{ onPick(b.dataset.c); ov.remove(); }));
+    ov.querySelector('.cancel').addEventListener('click', ()=>ov.remove());
+    ov.addEventListener('click', e=>{ if(e.target===ov) ov.remove(); });
   }
 
-  // ---------- MODAL ICON PICKER ----------
-  function openIconPicker(title, onPick){
-    const overlay = document.createElement('div');
-    overlay.className = 'modal-overlay';
-    const keys = Object.keys(ICONS);
-    overlay.innerHTML = `<div class="modal-box" style="max-width:380px;"><h3>${title}</h3><div class="icon-grid">${keys.map(k=>`<button type="button" class="icon-swatch" data-icon="${k}">${ICONS[k]}</button>`).join('')}</div><button class="modal-cancel">Annuler</button></div>`;
-    document.body.appendChild(overlay);
-    overlay.querySelectorAll('.icon-swatch').forEach(btn=>{
-      btn.addEventListener('click', ()=>{ onPick(btn.dataset.icon); overlay.remove(); });
-    });
-    overlay.querySelector('.modal-cancel').addEventListener('click', ()=>overlay.remove());
-    overlay.addEventListener('click', e=>{ if(e.target===overlay) overlay.remove(); });
-  }
-
-  // ---------- LOCK ----------
+  /* ---------- RENDER ---------- */
   function renderLock(){
-    const btn = document.getElementById('lockBtn');
-    btn.textContent = unlocked ? '🔓 ÉDITION ACTIVÉE — CLIQUER POUR VERROUILLER' : '🔒 MODE LECTURE — CLIQUER POUR DÉVERROUILLER';
-    btn.className = 'lock-btn' + (unlocked ? ' unlocked' : '');
-  }
-  document.getElementById('lockBtn').addEventListener('click', ()=>{
-    if(unlocked){ unlocked = false; renderAll(); return; }
-    const code = prompt("Code d'édition :");
-    if(code === EDIT_CODE){ unlocked = true; } else if(code !== null){ alert('Code incorrect.'); }
-    renderAll();
-  });
-
-  // ---------- PODIUM ----------
-  function renderPodium(){
-    const totals = computeGrandTotals();
-    const [first, second, third] = totals;
-    const dot = p => `<span class="pod-dot" style="background:${p.color}"></span>`;
-    const slot = (p, rankLabel, cls) => p ? `<div class="pod-slot ${cls}"><div class="pod-rank">${rankLabel}</div><div class="pod-name">${dot(p)}${p.name}</div><div class="pod-pts mono">${p.total} pts</div><div class="pod-bar"></div></div>` : '';
-    document.getElementById('podium').innerHTML = slot(second,'2E','p2') + slot(first,'1ER','p1') + slot(third,'3E','p3');
+    const b = document.getElementById('lockBtn');
+    b.textContent = unlocked ? '🔓 Mode édition — verrouiller' : '🔒 Mode lecture — déverrouiller';
+    b.classList.toggle('unlocked', unlocked);
   }
 
-  // ---------- PLAYERS ----------
-  function renderPlayers(){
-    const section = document.getElementById('playersSection');
-    if(!unlocked){ section.style.display = 'none'; return; }
-    section.style.display = '';
-    const el = document.getElementById('playersGrid');
-    el.innerHTML = state.players.map(p => `
-      <div class="player-chip">
-        <div class="color-dot ${unlocked?'editable':''}" style="background:${p.color}" data-pid="${p.id}"></div>
-        <input value="${p.name}" data-pid="${p.id}" class="playerNameInput" ${unlocked?'':'disabled'} />
-        ${unlocked ? `<button class="rm-btn" data-pid="${p.id}" title="Retirer">✕</button>` : ''}
-      </div>`).join('') + (unlocked ? `<div class="add-player-card" id="addPlayerCard">+ Ajouter un joueur</div>` : '');
-
-    if(unlocked){
-      el.querySelectorAll('.color-dot').forEach(dot=>{
-        dot.addEventListener('click', ()=>{
-          openColorPicker('Choisir une couleur', color=>{
-            const pl = state.players.find(x=>x.id===dot.dataset.pid);
-            pl.color = color; saveState(); renderAll();
-          });
-        });
-      });
-      el.querySelectorAll('.playerNameInput').forEach(inp=>{
-        inp.addEventListener('change', e=>{
-          const pl = state.players.find(x=>x.id===e.target.dataset.pid);
-          pl.name = e.target.value.trim() || pl.name;
-          saveState(); renderAll();
-        });
-      });
-      el.querySelectorAll('.rm-btn').forEach(btn=>{
-        btn.addEventListener('click', ()=>{
-          if(!confirm('Retirer ce joueur du championnat ?')) return;
-          state.players = state.players.filter(x=>x.id!==btn.dataset.pid);
-          Object.values(state.rounds).forEach(list=>list.forEach(r=>delete r.results[btn.dataset.pid]));
-          saveState(); renderAll();
-        });
-      });
-      const addCard = document.getElementById('addPlayerCard');
-      if(addCard) addCard.addEventListener('click', ()=>{
-        const name = prompt('Nom du nouveau joueur :');
-        if(!name) return;
-        openColorPicker('Couleur du joueur', color=>{
-          state.players.push({id:genId(), name:name.trim(), color});
-          saveState(); renderAll();
-        });
-      });
-    }
-  }
-
-  // ---------- GAMES / ROUNDS ----------
-  function renderGames(){
-    const el = document.getElementById('gamesGrid');
-    el.innerHTML = state.games.map(g => {
-      const rounds = state.rounds[g.id] || [];
-      const roundsHtml = rounds.map((round, ri) => {
-        round.teams = round.teams || [];
-        round.positions = round.positions || {};
-        round.participants = round.participants || state.players.map(p=>p.id);
-        round.teamMode = !!round.teamMode;
-        const participants = state.players.filter(p=>round.participants.includes(p.id));
-        const pts = computeRoundPoints(g, round);
-        const rows = (g.type==='rank' && round.teamMode) ? '' : participants.map(p=>{
-          if(g.type === 'rank'){
-            const val = round.positions[p.id] || '';
-            const P = round.participants.length;
-            let opts = '';
-            for(let n=1;n<=P;n++){ const pt = pointsForRank(n,P); opts += `<option value="${n}" ${val==n?'selected':''}>${n}${n===1?'er':'e'} (${pt}pts)</option>`; }
-            return `<div class="score-row"><span class="pname"><span class="color-dot" style="background:${p.color};width:10px;height:10px;"></span>${p.name}</span>
-              <select data-round="${round.id}" data-game="${g.id}" data-pid="${p.id}" ${unlocked?'':'disabled'}><option value="">—</option>${opts}</select></div>`;
-          } else {
-            const val = round.results[p.id] || '';
-            const badge = pts[p.id] > 0 ? `${pts[p.id]} pts` : (val ? '0 pt' : '');
-            return `<div class="score-row"><span class="pname"><span class="color-dot" style="background:${p.color};width:10px;height:10px;"></span>${p.name}</span>
-              <input class="time-input" placeholder="00:00:000" value="${val}" data-round="${round.id}" data-game="${g.id}" data-pid="${p.id}" ${unlocked?'':'disabled'} inputmode="numeric" />
-              <span class="badge-pts">${badge}</span></div>`;
-          }
-        }).join('');
-
-        const teamModeToggle = g.type==='rank' ? `<label class="teammode-toggle">
-          <input type="checkbox" data-teammode data-round="${round.id}" data-game="${g.id}" ${round.teamMode?'checked':''} ${unlocked?'':'disabled'} />
-          Manche jouée en équipes <span style="color:var(--muted); font-weight:400;">(sinon scores individuels)</span>
-        </label>` : '';
-
-        const participantsRow = `<div class="participants-block">
-          <div class="team-builder-head">
-            <span class="lbl">👥 QUI PARTICIPE À CETTE MANCHE ? (${round.participants.length})</span>
-          </div>
-          <div class="team-members-row">
-            ${state.players.map(p=>{
-              const active = round.participants.includes(p.id);
-              return `<button type="button" class="member-chip ${active?'active':''}" style="${active?`background:${p.color};border-color:${p.color};`:''}"
-                data-toggpart="${p.id}" data-round="${round.id}" data-game="${g.id}" ${unlocked?'':'disabled'}>${p.name}</button>`;
-            }).join('')}
-          </div>
-          ${g.type==='rank' ? `<div class="hint" style="margin:8px 0 0;">→ 1er = ${firstPlacePoints(round.participants.length)} pts pour ${round.participants.length} participant${round.participants.length>1?'s':''}</div>` : ''}
-          ${teamModeToggle}
-        </div>`;
-
-        let teamBuilder = '';
-        if(g.type === 'rank' && round.teamMode){
-          const N = round.teams.length;
-          const P = round.participants.length;
-          const posOpts = (currentPos) => {
-            let out = '<option value="">Position —</option>';
-            for(let r=1;r<=N;r++){
-              const pt = teamPointsForRank(r,N,P);
-              out += `<option value="${r}" ${currentPos==r?'selected':''}>${r}${r===1?'er':'e'} de ${N} (${pt}pts)</option>`;
-            }
-            return out;
-          };
-          const teamsHtml = round.teams.map(team => {
-            const adj = sizeAdjustment(team, round.teams);
-            const adjLabel = adj === 0 ? '' : (adj > 0 ? `<span style="color:var(--cyan)">+${adj} pt (effectif réduit)</span>` : `<span style="color:var(--magenta)">${adj} pt (effectif supérieur)</span>`);
-            return `
-            <div class="team-block">
-              <div class="team-head">
-                <span class="team-label">${team.label} <span style="color:var(--muted); font-weight:400;">(${team.members.length} joueur${team.members.length>1?'s':''})</span></span>
-                <select data-teampos data-round="${round.id}" data-game="${g.id}" data-team="${team.id}" ${unlocked?'':'disabled'}>
-                  ${posOpts(team.position)}
-                </select>
-                ${unlocked ? `<button class="rm-btn" data-rmteam="${team.id}" data-round="${round.id}" data-game="${g.id}" title="Supprimer l'équipe">✕</button>` : ''}
-              </div>
-              ${adjLabel ? `<div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; margin:-4px 0 8px;">${adjLabel}</div>` : ''}
-              <div class="team-members-row">
-                ${participants.map(p=>{
-                  const active = team.members.includes(p.id);
-                  return `<button type="button" class="member-chip ${active?'active':''}" style="${active?`background:${p.color};border-color:${p.color};`:''}"
-                    data-toggpid="${p.id}" data-team="${team.id}" data-round="${round.id}" data-game="${g.id}" ${unlocked?'':'disabled'}>${p.name}</button>`;
-                }).join('')}
-              </div>
-            </div>`;
-          }).join('');
-          teamBuilder = `<div class="team-builder">
-            <div class="team-builder-head">
-              <span class="lbl">⚡ ATTRIBUTION PAR ÉQUIPE — barème réduit selon nb d'équipes (optionnel)</span>
-              ${unlocked ? `<button class="add-team-btn" data-addteam="${g.id}" data-round="${round.id}">+ ÉQUIPE</button>` : ''}
-            </div>
-            ${teamsHtml}
-          </div>`;
-        }
-
-        return `<div class="round">
-          <div class="round-head" data-toggle="${round.id}">
-            <span class="rlabel">▸ ${round.label}</span>
-            <div class="round-actions">
-              <span class="rmeta">${Object.values(pts).reduce((a,b)=>a+(b>0?1:0),0)} résultat(s)</span>
-              ${unlocked ? `<button class="rm-btn" data-rmround="${round.id}" data-game="${g.id}" title="Supprimer la manche">✕</button>` : ''}
-            </div>
-          </div>
-          <div class="round-body" id="rb-${round.id}">${participantsRow}${teamBuilder}${rows}</div>
-        </div>`;
-      }).join('');
-
-      return `<div class="game-card">
-        <div class="game-top">
-          <div><div class="game-icon">${ICONS[g.icon]||ICONS.controller}</div><h3>${g.name}</h3><div class="desc">${g.desc}</div></div>
-          ${unlocked ? `<button class="add-round-btn" data-addround="${g.id}">+ MANCHE</button>` : ''}
-        </div>
-        ${roundsHtml || `<div class="hint" style="margin:10px 0 0;">Aucune manche pour l'instant.</div>`}
-        ${unlocked ? `<div class="delete-game-link" data-rmgame="${g.id}">🗑 Supprimer ce jeu</div>` : ''}
-      </div>`;
-    }).join('') + (unlocked ? `<div class="add-card" id="addGameCard"><div class="plus">+</div><div>AJOUTER UN JEU</div></div>`
-                             : `<div class="add-card" style="cursor:default;"><div class="locked-msg">🔒 Déverrouillez le mode édition<br>pour ajouter un jeu ou des manches</div></div>`);
-
-    // toggle round open/close
-    el.querySelectorAll('.round-head').forEach(h=>{
-      h.addEventListener('click', e=>{
-        if(e.target.closest('.rm-btn')) return;
-        document.getElementById('rb-'+h.dataset.toggle).classList.toggle('open');
-      });
+  function renderSeasons(){
+    const s = season();
+    document.getElementById('seasons').innerHTML =
+      state.seasons.map(x=>`<button class="season-tab ${x.id===s.id?'active':''}" data-season="${x.id}">${esc(x.name)}</button>`).join('') +
+      (unlocked ? `<button class="ghost-btn" id="addSeason">+ Nouvelle saison</button>` : '');
+    document.querySelectorAll('[data-season]').forEach(b=>b.addEventListener('click', ()=>{
+      viewSeasonId = b.dataset.season; try{ localStorage.setItem('heat-season', viewSeasonId); }catch(e){}
+      renderAll();
+    }));
+    const add = document.getElementById('addSeason');
+    if(add) add.addEventListener('click', ()=>{
+      const name = prompt('Nom de la nouvelle saison :', 'Saison ' + (state.seasons.length+1));
+      if(!name) return;
+      const ns = { id:genId(), name:name.trim(), races:[] };
+      state.seasons.push(ns); viewSeasonId = ns.id;
+      try{ localStorage.setItem('heat-season', ns.id); }catch(e){}
+      commit();
     });
+    document.getElementById('seasonEdit').innerHTML = unlocked ?
+      `<div class="season-name"><span class="block-lbl">Nom</span><input type="text" id="seasonName" value="${esc(s.name)}"></div>` : '';
+    const sn = document.getElementById('seasonName');
+    if(sn) sn.addEventListener('change', e=>{ s.name = e.target.value.trim() || s.name; commit(); });
+  }
 
-    if(unlocked){
-      el.querySelectorAll('select[data-round]').forEach(sel=>{
-        sel.addEventListener('change', e=>{
-          const round = state.rounds[e.target.dataset.game].find(r=>r.id===e.target.dataset.round);
-          round.positions[e.target.dataset.pid] = e.target.value ? +e.target.value : null;
-          recomputeRound(round);
-          saveState(); renderPodium(); renderTable(); renderGamesPreserveOpen();
-        });
-      });
-      el.querySelectorAll('[data-teammode]').forEach(cb=>{
-        cb.addEventListener('change', e=>{
-          const round = state.rounds[e.target.dataset.game].find(r=>r.id===e.target.dataset.round);
-          round.teamMode = e.target.checked;
-          recomputeRound(round);
-          saveState(); renderPodium(); renderTable(); renderGamesPreserveOpen();
-        });
-      });
-      el.querySelectorAll('[data-toggpart]').forEach(chip=>{
-        chip.addEventListener('click', ()=>{
-          const round = state.rounds[chip.dataset.game].find(r=>r.id===chip.dataset.round);
-          const pid = chip.dataset.toggpart;
-          const idx = round.participants.indexOf(pid);
-          if(idx >= 0){
-            round.participants.splice(idx, 1);
-            delete round.positions[pid];
-            round.teams.forEach(t=>{ t.members = t.members.filter(m=>m!==pid); });
-          } else {
-            round.participants.push(pid);
-          }
-          recomputeRound(round);
-          saveState(); renderPodium(); renderTable(); renderGamesPreserveOpen();
-        });
-      });
-      el.querySelectorAll('input.time-input').forEach(inp=>{
-        inp.addEventListener('input', e=>{
-          let digits = e.target.value.replace(/[^0-9]/g,'').slice(0,7);
-          let out = digits;
-          if(digits.length > 4) out = digits.slice(0,2) + ':' + digits.slice(2,4) + ':' + digits.slice(4);
-          else if(digits.length > 2) out = digits.slice(0,2) + ':' + digits.slice(2);
-          e.target.value = out;
-        });
-        inp.addEventListener('change', e=>{
-          const round = state.rounds[e.target.dataset.game].find(r=>r.id===e.target.dataset.round);
-          round.results[e.target.dataset.pid] = e.target.value.trim() || null;
-          saveState(); renderPodium(); renderTable(); renderGamesPreserveOpen();
-        });
-      });
-      el.querySelectorAll('[data-addround]').forEach(btn=>{
-        btn.addEventListener('click', ()=>{
-          const list = state.rounds[btn.dataset.addround];
-          const label = prompt('Nom de la manche :', 'Manche ' + (list.length+1)) || ('Manche ' + (list.length+1));
-          list.push({id:genId(), label, results:{}, teams:[], positions:{}, participants: state.players.map(p=>p.id), teamMode:false});
-          saveState(); renderAll();
-        });
-      });
-      el.querySelectorAll('[data-rmround]').forEach(btn=>{
-        btn.addEventListener('click', ()=>{
-          if(!confirm('Supprimer cette manche ?')) return;
-          state.rounds[btn.dataset.game] = state.rounds[btn.dataset.game].filter(r=>r.id!==btn.dataset.rmround);
-          saveState(); renderAll();
-        });
-      });
+  function renderPodium(){
+    const s = season();
+    const list = standings(s).slice(0,3);
+    document.getElementById('podiumSub').textContent = s.name;
+    const el = document.getElementById('podium');
+    if(!list.length){ el.innerHTML = `<div class="empty">Aucune course terminée pour l'instant — le podium apparaîtra après la première arrivée.</div>`; return; }
+    const labels = ['1er','2e','3e'];
+    el.innerHTML = `<div class="podium">${list.map((r,i)=>{
+      const p = player(r.pid);
+      return `<div class="pod p${i+1}"><div class="place">${labels[i]}</div>
+        <div class="name"><span class="dot" style="background:${p.color}"></span>${esc(p.name)}</div>
+        <div class="pts">${r.total} pts</div>
+        <div class="meta">${r.wins} victoire${r.wins>1?'s':''} · ${r.races} course${r.races>1?'s':''}</div>
+        <div class="step"></div></div>`;
+    }).join('')}</div>`;
+  }
 
-      el.querySelectorAll('[data-addteam]').forEach(btn=>{
-        btn.addEventListener('click', ()=>{
-          const round = state.rounds[btn.dataset.addteam].find(r=>r.id===btn.dataset.round);
-          round.teams = round.teams || [];
-          const letter = String.fromCharCode(65 + round.teams.length);
-          round.teams.push({id:genId(), label:'Équipe '+letter, position:null, members:[]});
-          recomputeRound(round);
-          saveState(); renderGamesPreserveOpen();
-        });
-      });
-      el.querySelectorAll('[data-rmteam]').forEach(btn=>{
-        btn.addEventListener('click', ()=>{
-          const round = state.rounds[btn.dataset.game].find(r=>r.id===btn.dataset.round);
-          round.teams = round.teams.filter(t=>t.id!==btn.dataset.rmteam);
-          recomputeRound(round);
-          saveState(); renderPodium(); renderTable(); renderGamesPreserveOpen();
-        });
-      });
-      el.querySelectorAll('[data-teampos]').forEach(sel=>{
-        sel.addEventListener('change', e=>{
-          const round = state.rounds[e.target.dataset.game].find(r=>r.id===e.target.dataset.round);
-          const team = round.teams.find(t=>t.id===e.target.dataset.team);
-          team.position = e.target.value ? +e.target.value : null;
-          recomputeRound(round);
-          saveState(); renderPodium(); renderTable(); renderGamesPreserveOpen();
-        });
-      });
-      el.querySelectorAll('[data-toggpid]').forEach(chip=>{
-        chip.addEventListener('click', ()=>{
-          const round = state.rounds[chip.dataset.game].find(r=>r.id===chip.dataset.round);
-          const team = round.teams.find(t=>t.id===chip.dataset.team);
-          const pid = chip.dataset.toggpid;
-          const wasInThisTeam = team.members.includes(pid);
-          round.teams.forEach(t=>{ t.members = t.members.filter(m=>m!==pid); });
-          if(!wasInThisTeam) team.members.push(pid);
-          recomputeRound(round);
-          saveState(); renderPodium(); renderTable(); renderGamesPreserveOpen();
-        });
-      });
-      const addGameCard = document.getElementById('addGameCard');
-      if(addGameCard) addGameCard.addEventListener('click', ()=>{
-        const name = prompt('Nom du nouveau jeu :');
-        if(!name) return;
-        const desc = prompt('Format / mode (optionnel) :') || '';
-        const isTime = confirm('Ce jeu se classe-t-il par CHRONO (comme le rallye) ?\nOK = chrono · Annuler = classement par position');
-        openIconPicker('Choisir une icône', icon=>{
-          const id = genId();
-          state.games.push({id, name, desc, icon, type: isTime?'time':'rank'});
-          state.rounds[id] = [];
-          saveState(); renderAll();
-        });
-      });
-      el.querySelectorAll('.delete-game-link[data-rmgame]').forEach(btn=>{
-        btn.addEventListener('click', ()=>{
-          if(!confirm('Supprimer ce jeu et toutes ses manches ?')) return;
-          state.games = state.games.filter(g=>g.id!==btn.dataset.rmgame);
-          delete state.rounds[btn.dataset.rmgame];
-          saveState(); renderAll();
-        });
-      });
+  function shortCircuit(c){
+    const map = { 'USA':'USA', 'Grande-Bretagne':'GBR', 'France':'FRA', 'Italie':'ITA' };
+    return map[c] || (c||'').slice(0,3).toUpperCase();
+  }
+
+  function renderStandings(){
+    const s = season();
+    const list = standings(s);
+    const el = document.getElementById('standings');
+    if(!list.length){ el.innerHTML = `<div class="empty">Le classement se remplira au fil des courses.</div>`; return; }
+    const races = s.races;
+    el.innerHTML = `<div class="table-wrap"><table>
+      <thead><tr><th>Pos.</th><th>Pilote</th><th>Courses</th><th>Victoires</th><th>Podiums</th>
+        ${races.map((r,i)=>`<th class="race-col">C${i+1}<span class="circ">${esc(shortCircuit(r.circuit))}</span></th>`).join('')}
+        <th>Total</th></tr></thead>
+      <tbody>${list.map(row=>{
+        const p = player(row.pid);
+        return `<tr><td class="rank">${row.rank}</td>
+          <td><div class="pl"><span class="dot" style="background:${p.color}"></span>${esc(p.name)}</div></td>
+          <td class="c num">${row.races}</td><td class="c num">${row.wins}</td><td class="c num">${row.podiums}</td>
+          ${races.map(r=>{ const x = row.per[r.id]; return `<td class="c num ${x&&x.rank===1?'win':''}" title="${x?x.rank+'e':''}">${x? x.pts : '–'}</td>`; }).join('')}
+          <td class="total">${row.total}</td></tr>`;
+      }).join('')}</tbody></table></div>`;
+  }
+
+  function renderRaces(){
+    const s = season();
+    const el = document.getElementById('races');
+    document.getElementById('racesSub').textContent = `${s.races.length} course${s.races.length>1?'s':''} · ${s.name}`;
+    if(!s.races.length && !unlocked){
+      el.innerHTML = `<div class="empty" style="grid-column:1/-1;">Aucune course dans cette saison.</div>`;
+    } else {
+      el.innerHTML = s.races.map((race,i)=> unlocked ? raceEditCard(race,i) : raceReadCard(race,i)).join('') +
+        (unlocked ? `<button class="add-race" id="addRace">+ Nouvelle course</button>` : '');
     }
+    if(unlocked) bindRaceEvents(s);
+    document.getElementById('seasonDelete').innerHTML = (unlocked && state.seasons.length > 1) ?
+      `<button class="del-link" id="delSeason">🗑 Supprimer la saison « ${esc(s.name)} » et toutes ses courses</button>` : '';
+    const ds = document.getElementById('delSeason');
+    if(ds) ds.addEventListener('click', ()=>{
+      if(!confirm(`Supprimer définitivement « ${s.name} » et ses ${s.races.length} course(s) ?`)) return;
+      state.seasons = state.seasons.filter(x=>x.id!==s.id); viewSeasonId = null; pickSeason(); commit();
+    });
   }
 
-  // keep round panels open after a value change within the same render cycle
-  let openRounds = new Set();
-  function renderGamesPreserveOpen(){
-    document.querySelectorAll('.round-body.open').forEach(b=>openRounds.add(b.id));
-    renderGames();
-    openRounds.forEach(id=>{ const b=document.getElementById(id); if(b) b.classList.add('open'); });
+  function raceHeader(race,i){
+    return `<div class="race-top"><div class="race-no">${i+1}</div>
+      <div><div class="lbl">Course ${i+1}</div><div class="circuit">${esc(race.circuit || 'Circuit à définir')}</div></div></div>`;
+  }
+  function raceChips(race){
+    const c = [];
+    if(race.weather) c.push(`<span class="chip weather">${esc(race.weather)}</span>`);
+    if(race.road) c.push(`<span class="chip">${esc(race.road)}</span>`);
+    return c.length ? `<div class="chips">${c.join('')}</div>` : '';
+  }
+  function raceReadCard(race,i){
+    const res = raceResults(race);
+    let body;
+    if(res.length){
+      body = `<ol class="result">${res.map(r=>{ const p = player(r.pid); return `<li class="${r.rank===1?'first':''}"><span class="pos">${r.rank}</span>
+        <span class="who"><span class="dot" style="background:${p.color}"></span>${esc(p.name)}</span><span class="pts">${r.pts} pts</span></li>`; }).join('')}</ol>`;
+    } else {
+      const names = race.participants.map(player).filter(Boolean);
+      body = `<div class="hint">Course à venir${names.length ? ' — sur la grille : ' + names.map(p=>esc(p.name)).join(', ') : ''}.</div>`;
+    }
+    return `<article class="race">${raceHeader(race,i)}${raceChips(race)}<div class="race-body">${body}</div></article>`;
+  }
+  function raceEditCard(race,i){
+    const P = race.participants.length;
+    const parts = race.participants.map(player).filter(Boolean);
+    const counts = {};
+    Object.entries(race.positions).forEach(([pid,r])=>{ if(r && race.participants.includes(pid)) counts[r] = (counts[r]||0)+1; });
+    const dup = Object.entries(counts).filter(([,n])=>n>1).map(([r])=>r);
+    return `<article class="race">${raceHeader(race,i)}<div class="race-body">
+      <div class="field"><label>Circuit</label><input type="text" list="circuitList" value="${esc(race.circuit)}" data-f="circuit" data-race="${race.id}" placeholder="USA, France…"></div>
+      <div class="field-row">
+        <div class="field"><label>Météo</label><input type="text" list="weatherList" value="${esc(race.weather)}" data-f="weather" data-race="${race.id}" placeholder="Pluie…"></div>
+        <div class="field"><label>Conditions de route</label><input type="text" value="${esc(race.road)}" data-f="road" data-race="${race.id}" placeholder="Note libre"></div>
+      </div>
+      <div class="block">
+        <span class="block-lbl">Pilotes au départ (${P}) · vainqueur = ${P ? firstPlacePoints(P) : 0} pts</span>
+        <div class="toggles">${state.players.length ? state.players.map(p=>{ const on = race.participants.includes(p.id);
+          return `<button class="tog ${on?'on':''}" style="${on?`background:${p.color}`:''}" data-tog="${p.id}" data-race="${race.id}">${esc(p.name)}</button>`; }).join('')
+          : `<span class="hint">Ajoute d'abord des pilotes dans la section « Pilotes » plus bas.</span>`}</div>
+      </div>
+      ${parts.length ? `<div class="block"><span class="block-lbl">Ordre d'arrivée</span>
+        ${parts.map(p=>{ const v = race.positions[p.id] || '';
+          let opts = '<option value="">—</option>';
+          for(let n=1;n<=P;n++) opts += `<option value="${n}" ${v==n?'selected':''}>${n}${n===1?'er':'e'} · ${pointsForRank(n,P)} pts</option>`;
+          return `<div class="pos-row"><span class="who"><span class="dot" style="background:${p.color}"></span>${esc(p.name)}</span>
+            <select data-pos="${p.id}" data-race="${race.id}">${opts}</select></div>`; }).join('')}
+        ${dup.length ? `<div class="warn">⚠ Position${dup.length>1?'s':''} en double : ${dup.join(', ')}</div>` : ''}
+      </div>` : ''}
+      <button class="del-link" data-delrace="${race.id}">🗑 Supprimer cette course</button>
+    </div></article>`;
   }
 
-  // ---------- TABLE ----------
-  function renderTable(){
-    const head = document.getElementById('tableHead');
-    head.innerHTML = `<th>Rang</th><th>Joueur</th><th>Manches</th>` + state.games.map(g=>`<th>${g.name}</th>`).join('') + `<th>Total</th>`;
-    const totals = computeGrandTotals();
-    const gameTotalsByGame = {}; state.games.forEach(g=>gameTotalsByGame[g.id]=computeGameTotal(g));
-    const medals = ['🥇','🥈','🥉'];
-    document.getElementById('tableBody').innerHTML = totals.map((p, rank) => `
-      <tr>
-        <td class="rank-cell">${medals[rank]?`<span class="medal">${medals[rank]}</span>`:''}${rank+1}</td>
-        <td><div class="pl-name-cell"><span class="color-dot" style="background:${p.color};width:10px;height:10px;"></span>${p.name}</div></td>
-        <td class="mono" style="color:var(--muted);">${p.played}</td>
-        ${state.games.map(g=>`<td class="mono">${gameTotalsByGame[g.id][p.id] || '–'}</td>`).join('')}
-        <td class="total-cell">${p.total}</td>
-      </tr>`).join('');
+  function bindRaceEvents(s){
+    const find = id => s.races.find(r=>r.id===id);
+    document.querySelectorAll('[data-f]').forEach(inp=>inp.addEventListener('change', e=>{
+      find(e.target.dataset.race)[e.target.dataset.f] = e.target.value.trim(); commit();
+    }));
+    document.querySelectorAll('[data-tog]').forEach(b=>b.addEventListener('click', ()=>{
+      const race = find(b.dataset.race), pid = b.dataset.tog;
+      if(race.participants.includes(pid)){ race.participants = race.participants.filter(x=>x!==pid); delete race.positions[pid]; }
+      else race.participants.push(pid);
+      const P = race.participants.length;
+      Object.keys(race.positions).forEach(k=>{ if(race.positions[k] > P) delete race.positions[k]; });
+      commit();
+    }));
+    document.querySelectorAll('[data-pos]').forEach(sel=>sel.addEventListener('change', e=>{
+      const race = find(e.target.dataset.race);
+      if(e.target.value) race.positions[e.target.dataset.pos] = +e.target.value; else delete race.positions[e.target.dataset.pos];
+      commit();
+    }));
+    document.querySelectorAll('[data-delrace]').forEach(b=>b.addEventListener('click', ()=>{
+      if(!confirm('Supprimer cette course et ses résultats ?')) return;
+      s.races = s.races.filter(r=>r.id!==b.dataset.delrace); commit();
+    }));
+    const add = document.getElementById('addRace');
+    if(add) add.addEventListener('click', ()=>{
+      const prev = s.races[s.races.length-1];
+      const grid = prev ? prev.participants.filter(pid=>player(pid)) : (state.players.length <= 6 ? state.players.map(p=>p.id) : []);
+      s.races.push({ id:genId(), circuit:CIRCUITS[s.races.length % CIRCUITS.length], weather:'', road:'', participants:[...grid], positions:{} });
+      commit();
+    });
+  }
+
+  function renderPlayers(){
+    const sec = document.getElementById('playersSection');
+    sec.hidden = !unlocked;
+    if(!unlocked) return;
+    const el = document.getElementById('players');
+    el.innerHTML = state.players.map(p=>`<div class="player">
+        <button class="swatch-btn" style="background:${p.color}" data-color="${p.id}" title="Changer la couleur"></button>
+        <input type="text" value="${esc(p.name)}" data-name="${p.id}">
+        <button class="x-btn" data-rm="${p.id}" title="Retirer du championnat">✕</button></div>`).join('') +
+      `<button class="ghost-btn" id="addPlayer">+ Ajouter un pilote</button>`;
+    el.querySelectorAll('[data-color]').forEach(b=>b.addEventListener('click', ()=>{
+      const p = player(b.dataset.color);
+      openColorPicker('Couleur de ' + p.name, p.color, c=>{ p.color = c; commit(); });
+    }));
+    el.querySelectorAll('[data-name]').forEach(inp=>inp.addEventListener('change', e=>{
+      const p = player(e.target.dataset.name); p.name = e.target.value.trim() || p.name; commit();
+    }));
+    el.querySelectorAll('[data-rm]').forEach(b=>b.addEventListener('click', ()=>{
+      const p = player(b.dataset.rm);
+      if(!confirm(`Retirer ${p.name} du championnat ? Ses résultats seront effacés de toutes les courses.`)) return;
+      state.players = state.players.filter(x=>x.id!==p.id);
+      state.seasons.forEach(s=>s.races.forEach(r=>{ r.participants = r.participants.filter(x=>x!==p.id); delete r.positions[p.id]; }));
+      commit();
+    }));
+    document.getElementById('addPlayer').addEventListener('click', ()=>{
+      const name = prompt('Nom du pilote :');
+      if(!name || !name.trim()) return;
+      const free = PALETTE.find(c=>!state.players.some(p=>p.color===c)) || PALETTE[0];
+      openColorPicker('Couleur de ' + name.trim(), free, c=>{ state.players.push({ id:genId(), name:name.trim(), color:c }); commit(); });
+    });
   }
 
   function renderAll(){
-    renderLock();
-    renderPodium();
-    renderPlayers();
-    renderGames();
-    renderTable();
+    pickSeason();
+    renderLock(); renderSeasons(); renderPodium(); renderStandings(); renderRaces(); renderPlayers();
   }
 
+  document.getElementById('lockBtn').addEventListener('click', ()=>{
+    if(unlocked){ unlocked = false; renderAll(); return; }
+    const code = prompt("Code d'édition :");
+    if(code === EDIT_CODE){ unlocked = true; renderAll(); }
+    else if(code !== null) alert('Code incorrect.');
+  });
+
+  renderAll();
   loadState();
-  setInterval(()=>{ if(!unlocked) loadState(); }, 10000);
+  setInterval(()=>{ if(!unlocked && !document.hidden) loadState(); }, 10000);
 </script>
 </body>
 </html>
