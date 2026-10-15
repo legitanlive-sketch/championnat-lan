@@ -132,8 +132,16 @@
   /* ---------- RACES ---------- */
   .races{ display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:18px; }
   .race{ background:var(--card); border:2px solid var(--ink); border-radius:var(--radius); overflow:hidden; display:flex; flex-direction:column; box-shadow:var(--shadow); }
-  .race-top{ position:relative; display:flex; align-items:center; gap:12px; padding:14px; background:var(--c, var(--night)); color:#fff; overflow:hidden; }
-  .race-top::after{ content:''; position:absolute; right:-20px; top:0; bottom:0; width:120px;
+  .race-top{ position:relative; display:flex; align-items:center; gap:12px; padding:14px; background:var(--night); color:#fff; overflow:hidden; min-height:76px; }
+  .race-top.has-flag::before{ content:''; position:absolute; inset:0; z-index:1;
+    background:linear-gradient(90deg, #1a1530 0%, #1a1530 40%, rgba(26,21,48,0) 66%); }
+  .race-top .flag-bg{ position:absolute; top:0; bottom:0; right:0; left:36%; z-index:0; }
+  .race-top .flag-bg svg{ width:100%; height:100%; display:block; }
+  .race-top .race-no, .race-top .race-txt{ position:relative; z-index:2; }
+  .race-top .circuit{ text-shadow:0 2px 4px rgba(0,0,0,0.5); }
+  .mini-flag{ display:block; width:22px; height:14px; margin:0 auto 4px; border-radius:2px; overflow:hidden; box-shadow:0 0 0 1px rgba(255,255,255,0.35); }
+  .mini-flag svg{ width:100%; height:100%; display:block; }
+  .race-top:not(.has-flag)::after{ content:''; position:absolute; right:-20px; top:0; bottom:0; width:120px;
     background:repeating-linear-gradient(115deg, rgba(255,255,255,0.18) 0 10px, transparent 10px 22px); }
   .race-no{ font-family:'Racing Sans One',sans-serif; font-size:24px; width:46px; height:46px; border-radius:50%; background:#fff; color:#1a1530;
     display:flex; align-items:center; justify-content:center; flex-shrink:0; border:3px solid #1a1530; }
@@ -345,9 +353,10 @@
   const PALETTE = ['#f55050','#ec501c','#f5a350','#ecb81c','#f5f550','#b8ec1c','#a3f550','#50ec1c','#50f550','#1cec50','#50f5a3','#1cecb8',
                    '#50f5f5','#1cb8ec','#50a3f5','#1c50ec','#5050f5','#501cec','#a350f5','#b81cec','#f550f5','#ec1cb8','#f550a3','#ec1c50'];
   const CIRCUITS = ['USA','Grande-Bretagne','France','Italie'];
+  const CIRCUIT_SUGGESTIONS = ['USA','Grande-Bretagne','France','Italie','Japon','Mexique','Espagne','Pays-Bas','Allemagne','Belgique','Monaco'];
   const WEATHER  = ['Ensoleillé','Nuageux','Pluie','Forte pluie','Brouillard','Grand froid','Canicule'];
 
-  document.getElementById('circuitList').innerHTML = CIRCUITS.map(c=>`<option value="${c}">`).join('');
+  document.getElementById('circuitList').innerHTML = CIRCUIT_SUGGESTIONS.map(c=>`<option value="${c}">`).join('');
   document.getElementById('weatherList').innerHTML = WEATHER.map(c=>`<option value="${c}">`).join('');
 
   let unlocked = false;
@@ -499,6 +508,7 @@
   }
 
   function shortCircuit(c){
+    const k = flagKey(c); if(k) return k.toUpperCase();
     const map = { 'USA':'USA', 'Grande-Bretagne':'GBR', 'France':'FRA', 'Italie':'ITA' };
     return map[c] || (c||'').slice(0,3).toUpperCase();
   }
@@ -511,7 +521,7 @@
     const races = s.races;
     el.innerHTML = `<div class="table-wrap"><table>
       <thead><tr><th>Pos.</th><th>Pilote</th><th>Courses</th><th>Victoires</th><th>Podiums</th>
-        ${races.map((r,i)=>`<th class="race-col">C${i+1}<span class="circ">${esc(shortCircuit(r.circuit))}</span></th>`).join('')}
+        ${races.map((r,i)=>`<th class="race-col">${flagSvg(r.circuit)?`<span class="mini-flag">${flagSvg(r.circuit)}</span>`:''}C${i+1}<span class="circ">${esc(shortCircuit(r.circuit))}</span></th>`).join('')}
         <th>Total</th></tr></thead>
       <tbody>${list.map(row=>{
         const p = player(row.pid);
@@ -543,16 +553,36 @@
     });
   }
 
-  function circuitColor(c){
-    const map = { 'USA':'#2c5bd8', 'Grande-Bretagne':'#1f9a52', 'France':'#12a6b5', 'Italie':'#e8322a' };
-    if(map[c]) return map[c];
-    const extra = ['#ff7a1a','#8a3ffc','#d9346f','#0f8b8d','#c98a00'];
-    let n = 0; for(const ch of (c||'')) n = (n*31 + ch.charCodeAt(0)) >>> 0;
-    return c ? extra[n % extra.length] : 'var(--night)';
+  // Drapeaux dessinés en SVG (les émojis drapeau ne s'affichent pas sous Windows)
+  function hz(cols){ const n=cols.length; return `<svg viewBox="0 0 30 ${n*6}" preserveAspectRatio="xMidYMid slice">${cols.map((c,i)=>`<rect y="${i*6}" width="30" height="6" fill="${c}"/>`).join('')}</svg>`; }
+  function vt(cols){ return `<svg viewBox="0 0 30 20" preserveAspectRatio="xMidYMid slice">${cols.map((c,i)=>`<rect x="${i*10}" width="10" height="20" fill="${c}"/>`).join('')}</svg>`; }
+  const FLAGS = {
+    usa: (()=>{ let s=''; for(let i=0;i<13;i++) s+=`<rect y="${i*100/13}" width="190" height="${100/13+0.3}" fill="${i%2?'#fff':'#B22234'}"/>`;
+      let st=''; for(let r=0;r<5;r++) for(let c=0;c<6;c++) st+=`<circle cx="${7+c*12.4}" cy="${6+r*10.4}" r="2.2" fill="#fff"/>`;
+      return `<svg viewBox="0 0 190 100" preserveAspectRatio="xMidYMid slice">${s}<rect width="76" height="53.85" fill="#3C3B6E"/>${st}</svg>`; })(),
+    gbr: `<svg viewBox="0 0 60 30" preserveAspectRatio="xMidYMid slice"><rect width="60" height="30" fill="#012169"/><path d="M0 0L60 30M60 0L0 30" stroke="#fff" stroke-width="6"/><path d="M0 0L60 30M60 0L0 30" stroke="#C8102E" stroke-width="2"/><path d="M30 0V30M0 15H60" stroke="#fff" stroke-width="10"/><path d="M30 0V30M0 15H60" stroke="#C8102E" stroke-width="6"/></svg>`,
+    fra: vt(['#0055A4','#ffffff','#EF4135']),
+    ita: vt(['#009246','#ffffff','#CE2B37']),
+    mex: vt(['#006847','#ffffff','#CE1126']).replace('</svg>','<circle cx="15" cy="10" r="2.6" fill="#8C5A2B"/></svg>'),
+    bel: vt(['#000000','#FDDA24','#EF3340']),
+    jpn: `<svg viewBox="0 0 30 20" preserveAspectRatio="xMidYMid slice"><rect width="30" height="20" fill="#fff"/><circle cx="15" cy="10" r="6" fill="#BC002D"/></svg>`,
+    esp: `<svg viewBox="0 0 30 20" preserveAspectRatio="xMidYMid slice"><rect width="30" height="20" fill="#AA151B"/><rect y="5" width="30" height="10" fill="#F1BF00"/></svg>`,
+    nld: hz(['#AE1C28','#ffffff','#21468B']),
+    deu: hz(['#000000','#DD0000','#FFCE00']),
+    mco: hz(['#CE1126','#ffffff'])
+  };
+  const FLAG_ALIASES = { usa:'usa','etats-unis':'usa','etats unis':'usa','amerique':'usa',
+    'grande-bretagne':'gbr','grande bretagne':'gbr','angleterre':'gbr','royaume-uni':'gbr','uk':'gbr','gbr':'gbr',
+    france:'fra', italie:'ita', mexique:'mex', belgique:'bel', japon:'jpn', espagne:'esp', 'pays-bas':'nld', 'pays bas':'nld', hollande:'nld', allemagne:'deu', monaco:'mco' };
+  function flagKey(c){
+    const k = (c||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().trim();
+    return FLAG_ALIASES[k] || null;
   }
+  function flagSvg(c){ const k = flagKey(c); return k ? FLAGS[k] : ''; }
   function raceHeader(race,i){
-    return `<div class="race-top" style="--c:${circuitColor(race.circuit)}"><div class="race-no">${i+1}</div>
-      <div><div class="lbl">Course ${i+1}</div><div class="circuit">${esc(race.circuit || 'Circuit à définir')}</div></div></div>`;
+    const flag = flagSvg(race.circuit);
+    return `<div class="race-top ${flag?'has-flag':''}">${flag?`<div class="flag-bg">${flag}</div>`:''}<div class="race-no">${i+1}</div>
+      <div class="race-txt"><div class="lbl">Course ${i+1}</div><div class="circuit">${esc(race.circuit || 'Circuit à définir')}</div></div></div>`;
   }
   function raceChips(race){
     const c = [];
